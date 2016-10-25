@@ -16,6 +16,8 @@ import numpy
 DATASET = 'action_dataset.csv'
 # Text file used to create the action vectors with word2vec
 ACTION_TEXT = 'actions.txt'
+# List of unique activities in the dataset
+UNIQUE_ACTIVITIES = 'unique_activities.json'
 # List of unique actions in the dataset
 UNIQUE_ACTIONS = 'unique_actions.json'
 # Word2vec model generated with gensim
@@ -35,6 +37,7 @@ SEP = ' '
 # Generates the text file from the csv
 def process_csv():
     actions = ''    
+    activities_set = set()
     actions_set = set()
     with open(DATASET, 'rb') as csvfile:
         print 'Processing:', DATASET
@@ -48,6 +51,7 @@ def process_csv():
             activity = row[2]
             if activity != NONE:
                 actions += action + SEP
+                activities_set.add(activity)
                 actions_set.add(action)
             if i % 10000 == 0:
                 print '  -Actions processed:', i
@@ -55,6 +59,7 @@ def process_csv():
     
     with open(ACTION_TEXT, 'w') as textfile: 
         textfile.write(actions)     
+    json.dump(list(activities_set), open(UNIQUE_ACTIVITIES, 'w'))
     json.dump(list(actions_set), open(UNIQUE_ACTIONS, 'w'))
     print 'Text file saved'
 
@@ -135,8 +140,11 @@ def create_vector_dataset_no_time():
     print 'Creating dataset...'
     dataset = []
     action_vectors = json.load(open(ACTIONS_VECTORS, 'r'))
+    unique_activities = json.load(open(UNIQUE_ACTIVITIES, 'r'))
     activities = json.load(open(ACTIVITIES_ORDERED, 'r'))
     for activity in activities:
+        one_hot_activity = [0.0] * 10
+        one_hot_activity[unique_activities.index(activity['name'])] = 1.0
         training_example = {
             'activity' : activity['name'],
             'actions' : []         
@@ -147,7 +155,7 @@ def create_vector_dataset_no_time():
         # Padding        
         if len(training_example['actions']) < 10:
             for i in range(10 - len(training_example['actions'])):
-              training_example['actions'].append([0] * 200)
+              training_example['actions'].append([0.0] * 200)
               
         dataset.append(training_example)
     print 'Writing file'
