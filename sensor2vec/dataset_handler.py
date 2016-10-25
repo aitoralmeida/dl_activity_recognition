@@ -143,10 +143,11 @@ def create_vector_dataset_no_time():
     unique_activities = json.load(open(UNIQUE_ACTIVITIES, 'r'))
     activities = json.load(open(ACTIVITIES_ORDERED, 'r'))
     for activity in activities:
-        one_hot_activity = [0.0] * 10
-        one_hot_activity[unique_activities.index(activity['name'])] = 1.0
+        one_hot_activity = [0.0] * len(unique_activities)
+        activity_index = unique_activities.index(activity['name'])
+        one_hot_activity[activity_index] = 1.0
         training_example = {
-            'activity' : activity['name'],
+            'activity' : one_hot_activity,
             'actions' : []         
         }
         for action in activity['actions']:
@@ -161,11 +162,6 @@ def create_vector_dataset_no_time():
     print 'Writing file'
     json.dump(dataset, open(DATASET_NO_TIME,'w'))
     print 'Created dataset'
-            
-    
-    
-        
-    
     
 if __name__ == '__main__':
     print 'Start...'
