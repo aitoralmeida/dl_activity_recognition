@@ -20,7 +20,7 @@ DATASET_NO_TIME = 'dataset_no_time.json'
 UNIQUE_ACTIVITIES = 'unique_activities.json'
 
 # Maximun number of actions in an activity
-ACTIVITY_MAX_LENGHT = 10
+ACTIVITY_MAX_LENGHT = 16
 # Number of dimensions in a action
 ACTION_MAX_LENGHT = 200
 
