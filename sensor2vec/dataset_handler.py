@@ -33,9 +33,11 @@ DATASET_NO_TIME = 'dataset_no_time.json'
 NONE = 'None'
 # Separator for the text file
 SEP = ' '
+# Maximun number of actions in an activity
+ACTIVITY_MAX_LENGHT = 16
 
 # Generates the text file from the csv
-def process_csv():
+def process_csv(none=False):
     actions = ''    
     activities_set = set()
     actions_set = set()
@@ -49,9 +51,12 @@ def process_csv():
                 continue        
             action = row[1]
             activity = row[2]
+            if none:
+                activities_set.add(activity)                
             if activity != NONE:
                 actions += action + SEP
-                activities_set.add(activity)
+                if not none:
+                    activities_set.add(activity)
                 actions_set.add(action)
             if i % 10000 == 0:
                 print '  -Actions processed:', i
@@ -77,7 +82,7 @@ def create_vector_file():
     print 'Saved action vectors'
 
 # Processes the csv and orders the activities in a json    
-def order_activities():
+def order_activities(none = False):
     with open(DATASET, 'rb') as csvfile:
         print 'Processing:', DATASET
         reader = csv.reader(csvfile)        
@@ -94,7 +99,7 @@ def order_activities():
             date = row[0]            
             action = row[1]
             activity = row[2]
-            if activity != NONE and activity != '':
+            if (activity != NONE and not none) or (none):
                 if activity == current_activity['name']:
                     action_data = {
                         'action':action,
@@ -154,8 +159,8 @@ def create_vector_dataset_no_time():
             training_example['actions'].append(action_vectors[action['action']])
 
         # Padding        
-        if len(training_example['actions']) < 10:
-            for i in range(10 - len(training_example['actions'])):
+        if len(training_example['actions']) < ACTIVITY_MAX_LENGHT:
+            for i in range(ACTIVITY_MAX_LENGHT - len(training_example['actions'])):
               training_example['actions'].append([0.0] * 200)
               
         dataset.append(training_example)
@@ -165,9 +170,9 @@ def create_vector_dataset_no_time():
     
 if __name__ == '__main__':
     print 'Start...'
-    #process_csv()
+    #process_csv(True)
     #create_vector_file()
-    #order_activities()
+    #order_activities(True)
     #calculate_statistics()
     create_vector_dataset_no_time()
     print 'Fin'
