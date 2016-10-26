@@ -13,7 +13,9 @@ import numpy
 
 
 # Dataset generated with the synthetic generator
-DATASET = 'action_dataset.csv'
+DATASET_ACTION = 'action_dataset.csv'
+# Kasteren dataset
+DATASET_KASTEREN = 'kasteren_dataset.csv'
 # Text file used to create the action vectors with word2vec
 ACTION_TEXT = 'actions.txt'
 # List of unique activities in the dataset
@@ -34,7 +36,11 @@ NONE = 'None'
 # Separator for the text file
 SEP = ' '
 # Maximun number of actions in an activity
-ACTIVITY_MAX_LENGHT = 16
+ACTIVITY_MAX_LENGHT = 32
+# word2vec dimensions for an action
+ACTION_MAX_LENGHT = 50
+
+DATASET = DATASET_KASTEREN
 
 # Generates the text file from the csv
 def process_csv(none=False):
@@ -52,11 +58,11 @@ def process_csv(none=False):
             action = row[1]
             activity = row[2]
             if none:
-                activities_set.add(activity)                
-            if activity != NONE:
+                activities_set.add(activity)      
+                actions_set.add(action)
+            if activity != NONE and not none:
                 actions += action + SEP
-                if not none:
-                    activities_set.add(activity)
+                activities_set.add(activity)
                 actions_set.add(action)
             if i % 10000 == 0:
                 print '  -Actions processed:', i
@@ -76,7 +82,11 @@ def create_vector_file():
     model = Word2Vec.load(ACTIONS_MODEL)
     actions_vectors = {}
     for action in actions:
-        actions_vectors[action] = model[action].tolist()
+        try:
+            action_values = model[action].tolist()
+        except:
+            action_values = [0.0] * ACTION_MAX_LENGHT
+        actions_vectors[action] = action_values
      
     json.dump(actions_vectors, open(ACTIONS_VECTORS, 'w'), indent=2)
     print 'Saved action vectors'
@@ -156,12 +166,13 @@ def create_vector_dataset_no_time():
             'actions' : []         
         }
         for action in activity['actions']:
-            training_example['actions'].append(action_vectors[action['action']])
+            action_values = action_vectors[action['action']]
+            training_example['actions'].append(action_values)
 
         # Padding        
         if len(training_example['actions']) < ACTIVITY_MAX_LENGHT:
             for i in range(ACTIVITY_MAX_LENGHT - len(training_example['actions'])):
-              training_example['actions'].append([0.0] * 200)
+              training_example['actions'].append([0.0] * ACTION_MAX_LENGHT)
               
         dataset.append(training_example)
     print 'Writing file'
@@ -170,10 +181,10 @@ def create_vector_dataset_no_time():
     
 if __name__ == '__main__':
     print 'Start...'
-    #process_csv(True)
-    #create_vector_file()
-    #order_activities(True)
-    #calculate_statistics()
+#    process_csv(True)
+#    create_vector_file()
+#    order_activities(True)
+#    calculate_statistics()
     create_vector_dataset_no_time()
     print 'Fin'
 
