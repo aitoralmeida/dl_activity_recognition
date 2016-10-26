@@ -20,9 +20,9 @@ DATASET_NO_TIME = 'dataset_no_time.json'
 UNIQUE_ACTIVITIES = 'unique_activities.json'
 
 # Maximun number of actions in an activity
-ACTIVITY_MAX_LENGHT = 16
+ACTIVITY_MAX_LENGHT = 32
 # Number of dimensions in a action
-ACTION_MAX_LENGHT = 200
+ACTION_MAX_LENGHT = 50
 
 
 def save_model(model):
@@ -78,9 +78,28 @@ for i, activity in enumerate(activities):
     actions = []
     for action in activity['actions']:
         actions.append(np.array(action))
-    X.append(np.array(actions))
-    y.append(np.array(activity['activity']))
     
+    actions_array = np.array(actions)
+    X.append(actions_array)
+    y.append(np.array(activity['activity']))
+#    if X == None:
+#        X = actions_array
+#    else:
+##        print i
+##        print activity['activity']
+##        print 'Actions shape'
+##        print actions_array.shape
+##        print 'X shape'
+##        print X.shape
+##        print actions_array[0]
+#        np.vstack((X, actions_array))
+#    if y == None:
+#        y = np.array(activity['activity'])
+#    else:
+#        np.vstack((y, np.array(activity['activity'])))
+    
+    
+
 total_examples = len(X)
 test_per = 0.2
 limit = int(test_per * total_examples)
