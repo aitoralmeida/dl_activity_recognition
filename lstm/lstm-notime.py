@@ -20,9 +20,9 @@ import numpy as np
 # Directory of datasets
 DIR = '../sensor2vec/kasteren_dataset/'
 # Dataset with vectors but without the action timestamps
-DATASET_NO_TIME = '../sensor2vec/kasteren_dataset/dataset_no_time.json'
+DATASET_NO_TIME = DIR + 'dataset_no_time.json'
 # List of unique actions in the dataset
-UNIQUE_ACTIVITIES = 'unique_activities.json'
+UNIQUE_ACTIVITIES = DIR + 'unique_activities.json'
 
 # Maximun number of actions in an activity
 ACTIVITY_MAX_LENGHT = 32
