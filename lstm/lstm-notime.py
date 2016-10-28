@@ -158,7 +158,7 @@ def main(argv):
 
     print 'Training...'
     sys.stdout.flush()
-    history = model.fit(X, y, batch_size=50, nb_epoch=100, validation_data=(X_test, y_test))
+    history = model.fit(X, y, batch_size=50, nb_epoch=1500, validation_data=(X_test, y_test))
     print 'Saving model...'
     sys.stdout.flush()
     save_model(model)
