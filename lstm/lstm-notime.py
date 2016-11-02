@@ -9,7 +9,10 @@ from collections import Counter
 import json
 import sys
 
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
 
 from keras.models import Sequential
 from keras.models import model_from_json
@@ -146,8 +149,10 @@ def main(argv):
     print 'Building model...'
     sys.stdout.flush()
     model = Sequential()
-    model.add(LSTM(100, input_shape=(max_sequence_length, ACTION_MAX_LENGHT)))
-    model.add(Dropout(0.5))
+    #model.add(LSTM(512, return_sequences=True, input_shape=(max_sequence_length, ACTION_MAX_LENGHT)))
+    #model.add(Dropout(0.8))
+    model.add(LSTM(512, return_sequences=False, input_shape=(max_sequence_length, ACTION_MAX_LENGHT)))
+    #model.add(Dropout(0.8))
     model.add(Dense(total_activities))
     model.add(Activation('softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'mse', 'mae'])
@@ -158,7 +163,7 @@ def main(argv):
 
     print 'Training...'
     sys.stdout.flush()
-    history = model.fit(X, y, batch_size=50, nb_epoch=1500, validation_data=(X_test, y_test))
+    history = model.fit(X, y, batch_size=50, nb_epoch=3000, validation_data=(X_test, y_test))
     print 'Saving model...'
     sys.stdout.flush()
     save_model(model)
