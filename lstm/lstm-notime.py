@@ -127,7 +127,7 @@ def main(argv):
     check_activity_distribution(y, unique_activities)
     #X = X.reshape(X.shape[0], 1, ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)
     X_test = np.array(X_test)
-    y_test = np.array(y_test)
+    y_test = np.array(y_test)    
 
     print 'Activity distribution for testing:'
     check_activity_distribution(y_test, unique_activities)
