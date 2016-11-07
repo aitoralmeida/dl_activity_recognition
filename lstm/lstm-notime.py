@@ -179,7 +179,7 @@ def main(argv):
     history['loss'] = []
     history['val_loss'] = []
     for i in range(500):
-        hist = model.fit(X, y, nb_epoch=1, batch_size=batch_size, verbose=2, shuffle=False)
+        hist = model.fit(X, y, nb_epoch=1, batch_size=batch_size, shuffle=False)
         history['acc'].append(hist['acc'])
         history['val_acc'].append(hist['val_acc'])
         history['loss'].append(hist['loss'])
