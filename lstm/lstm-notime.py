@@ -149,9 +149,9 @@ def main(argv):
     print 'Building model...'
     sys.stdout.flush()
     model = Sequential()
-    #model.add(LSTM(512, return_sequences=True, input_shape=(max_sequence_length, ACTION_MAX_LENGHT)))
+    model.add(LSTM(512, return_sequences=True, dropout_W=0.2, dropout_U=0.2, input_shape=(max_sequence_length, ACTION_MAX_LENGHT)))
     #model.add(Dropout(0.8))
-    model.add(LSTM(512, return_sequences=False, input_shape=(max_sequence_length, ACTION_MAX_LENGHT)))
+    model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2))
     #model.add(Dropout(0.8))
     model.add(Dense(total_activities))
     model.add(Activation('softmax'))
