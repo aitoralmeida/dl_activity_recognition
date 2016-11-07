@@ -58,8 +58,8 @@ def plot_training_info(metrics, save, history):
     # summarize history for accuracy
     if 'accuracy' in metrics:
         
-        plt.plot(history.history['acc'])
-        plt.plot(history.history['val_acc'])
+        plt.plot(history['acc'])
+        plt.plot(history['val_acc'])
         plt.title('model accuracy')
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
@@ -72,8 +72,8 @@ def plot_training_info(metrics, save, history):
 
     # summarize history for loss
     if 'loss' in metrics:
-        plt.plot(history.history['loss'])
-        plt.plot(history.history['val_loss'])
+        plt.plot(history['loss'])
+        plt.plot(history['val_loss'])
         plt.title('model loss')
         plt.ylabel('loss')
         plt.xlabel('epoch')
@@ -148,10 +148,12 @@ def main(argv):
     
     print 'Building model...'
     sys.stdout.flush()
+    batch_size = 1
     model = Sequential()
-    model.add(LSTM(512, return_sequences=True, dropout_W=0.2, dropout_U=0.2, input_shape=(max_sequence_length, ACTION_MAX_LENGHT)))
+    # Test with Stateful layers
+    model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2, batch_input_shape=(batch_size, max_sequence_length, ACTION_MAX_LENGHT)))
     #model.add(Dropout(0.8))
-    model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2))
+    #model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2))
     #model.add(Dropout(0.8))
     model.add(Dense(total_activities))
     model.add(Activation('softmax'))
@@ -161,14 +163,37 @@ def main(argv):
     sys.stdout.flush()
   
 
-    print 'Training...'
+    print 'Training...'    
     sys.stdout.flush()
-    history = model.fit(X, y, batch_size=50, nb_epoch=3000, validation_data=(X_test, y_test))
+    # Automatic training for Stateless LSTM
+    """
+    manual_training = False
+    history = model.fit(X, y, batch_size=batch_size, nb_epoch=3000, validation_data=(X_test, y_test))
+    """
+    # Test manual training
+    # we need a manual history dict with 'acc', 'val_acc', 'loss' and 'val_loss' keys
+    manual_training = True
+    history = {}
+    history['acc'] = []
+    history['val_acc'] = []
+    history['loss'] = []
+    history['val_loss'] = []
+    for i in range(500):
+        hist = model.fit(X, y, nb_epoch=1, batch_size=batch_size, verbose=2, shuffle=False)
+        history['acc'].append(hist['acc'])
+        history['val_acc'].append(hist['val_acc'])
+        history['loss'].append(hist['loss'])
+        history['val_loss'].append(hist['val_loss'])
+        model.reset_states()
+ 
     print 'Saving model...'
     sys.stdout.flush()
     save_model(model)
     print 'Model saved'
-    plot_training_info(['accuracy', 'loss'], True, history)
+    if manual_training == True:
+        plot_training_info(['accuracy', 'loss'], True, history)
+    else:
+        plot_training_info(['accuracy', 'loss'], True, history.history)
 
 
 if __name__ == "__main__":
