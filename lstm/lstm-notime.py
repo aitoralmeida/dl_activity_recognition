@@ -179,11 +179,11 @@ def main(argv):
     history['loss'] = []
     history['val_loss'] = []
     for i in range(500):
-        hist = model.fit(X, y, nb_epoch=1, batch_size=batch_size, shuffle=False)
-        history['acc'].append(hist['acc'])
-        history['val_acc'].append(hist['val_acc'])
-        history['loss'].append(hist['loss'])
-        history['val_loss'].append(hist['val_loss'])
+        hist = model.fit(X, y, nb_epoch=1, batch_size=batch_size, shuffle=False, validation_data=(X_test, y_test))
+        history['acc'].append(hist.history['acc'])
+        history['val_acc'].append(hist.history['val_acc'])
+        history['loss'].append(hist.history['loss'])
+        history['val_loss'].append(hist.history['val_loss'])
         model.reset_states()
  
     print 'Saving model...'
