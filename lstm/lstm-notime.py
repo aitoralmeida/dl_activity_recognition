@@ -150,8 +150,7 @@ def main(argv):
     sys.stdout.flush()
     batch_size = 1
     model = Sequential()
-    # Test with Stateful layers
-    model.add(LSTM(512, return_sequences=False, stateful=True, dropout_W=0.2, dropout_U=0.2, batch_input_shape=(batch_size, max_sequence_length, ACTION_MAX_LENGHT)))
+    model.add(LSTM(512, return_sequences=False, stateful=False, dropout_W=0.2, dropout_U=0.2, batch_input_shape=(batch_size, max_sequence_length, ACTION_MAX_LENGHT)))
     #model.add(LSTM(512, return_sequences=False, stateful=True, batch_input_shape=(batch_size, max_sequence_length, ACTION_MAX_LENGHT)))
     #model.add(Dropout(0.8))
     #model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2))
@@ -167,12 +166,12 @@ def main(argv):
     print 'Training...'    
     sys.stdout.flush()
     # Automatic training for Stateless LSTM
-    """
     manual_training = False
-    history = model.fit(X, y, batch_size=batch_size, nb_epoch=3000, validation_data=(X_test, y_test))
-    """
+    history = model.fit(X, y, batch_size=batch_size, nb_epoch=500, validation_data=(X_test, y_test), shuffle=False)
+ 
     # Test manual training
     # we need a manual history dict with 'acc', 'val_acc', 'loss' and 'val_loss' keys
+    """
     manual_training = True
     history = {}
     history['acc'] = []
@@ -187,7 +186,7 @@ def main(argv):
         history['loss'].append(hist.history['loss'])
         history['val_loss'].append(hist.history['val_loss'])
         model.reset_states()
- 
+    """
     print 'Saving model...'
     sys.stdout.flush()
     save_model(model)
