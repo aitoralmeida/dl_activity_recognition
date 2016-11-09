@@ -151,7 +151,8 @@ def main(argv):
     batch_size = 1
     model = Sequential()
     # Test with Stateful layers
-    model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2, batch_input_shape=(batch_size, max_sequence_length, ACTION_MAX_LENGHT)))
+    model.add(LSTM(512, return_sequences=False, stateful=True, dropout_W=0.2, dropout_U=0.2, batch_input_shape=(batch_size, max_sequence_length, ACTION_MAX_LENGHT)))
+    #model.add(LSTM(512, return_sequences=False, stateful=True, batch_input_shape=(batch_size, max_sequence_length, ACTION_MAX_LENGHT)))
     #model.add(Dropout(0.8))
     #model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2))
     #model.add(Dropout(0.8))
@@ -178,7 +179,8 @@ def main(argv):
     history['val_acc'] = []
     history['loss'] = []
     history['val_loss'] = []
-    for i in range(500):
+    for i in range(1000):
+        print 'epoch: ', i
         hist = model.fit(X, y, nb_epoch=1, batch_size=batch_size, shuffle=False, validation_data=(X_test, y_test))
         history['acc'].append(hist.history['acc'])
         history['val_acc'].append(hist.history['val_acc'])
