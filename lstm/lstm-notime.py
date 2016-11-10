@@ -13,19 +13,27 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
+import pandas as pd
 
 from keras.models import Sequential
 from keras.models import model_from_json
 from keras.layers import Dense, Activation, Dropout
 from keras.layers import LSTM
+from keras.utils import np_utils
+from keras.preprocessing.sequence import pad_sequences
+
 import numpy as np
 
 # Directory of datasets
 DIR = '../sensor2vec/kasteren_dataset/'
 # Dataset with vectors but without the action timestamps
-DATASET_NO_TIME = DIR + 'dataset_no_time.json'
-# List of unique actions in the dataset
+DATASET_CSV = DIR + 'base_kasteren_reduced.csv'
+# List of unique activities in the dataset
 UNIQUE_ACTIVITIES = DIR + 'unique_activities.json'
+# List of unique actions in the dataset
+UNIQUE_ACTIONS = DIR + 'unique_actions.json'
+# Action vectors
+ACTION_VECTORS = DIR + 'actions_vectors.json'
 
 # Maximun number of actions in an activity
 ACTIVITY_MAX_LENGHT = 32
@@ -88,9 +96,46 @@ def plot_training_info(metrics, save, history):
         
     
 def main(argv):    
+    # Load dataset from csv file
+    df_dataset = pd.read_csv(DATASET_CSV, parse_dates=[[0, 1]], header=None, index_col=0, sep=' ')
+    df_dataset.columns = ['sensor', 'action', 'event', 'activity']
+    df_dataset.index.names = ["timestamp"]
     unique_activities = json.load(open(UNIQUE_ACTIVITIES, 'r'))
     total_activities = len(unique_activities)
+    action_vectors = json.load(open(ACTION_VECTORS, 'r'))
+    
+    # New data framing
+    print 'Preparing training set...'
 
+    X = []
+    y = []
+    
+    # Generate the dict to transform activities to integer numbers
+    activity_to_int = dict((c, i) for i, c in enumerate(unique_activities))
+    # Generate the dict to transform integer numbers to activities
+    int_to_activity = dict((i, c) for i, c in enumerate(unique_activities))
+
+    current_activity = ""
+    actions = []
+    for index in df_dataset.index:
+        action = df_dataset.loc[index, 'action']        
+        actions.append(np.array(action_vectors[action]))
+        
+        if current_activity != df_dataset.loc[index, 'activity']:
+            current_activity = df_dataset.loc[index, 'activity']
+            if len(actions) > 0:
+                X.append(actions)
+                y.append(activity_to_int[df_dataset.loc[index, 'activity']])
+                actions = []
+
+    # Use sequence padding for training samples
+    X = pad_sequences(X, maxlen=ACTIVITY_MAX_LENGHT, dtype='float32')
+    # Tranform class labels to one-hot encoding
+    y = np_utils.to_categorical(y)
+    
+
+    """
+    # Old data framing
     print 'Preparing training set...'
     print '  - Reading dataset'
     sys.stdout.flush()
@@ -109,7 +154,7 @@ def main(argv):
         X.append(np.array(actions))
         y.append(np.array(activity['activity']))
     
-    
+    """
     total_examples = len(X)
     test_per = 0.2
     limit = int(test_per * total_examples)
@@ -143,7 +188,6 @@ def main(argv):
 
 
     # Build the model
-
     max_sequence_length = ACTIVITY_MAX_LENGHT
     
     print 'Building model...'
@@ -166,26 +210,8 @@ def main(argv):
     sys.stdout.flush()
     # Automatic training for Stateless LSTM
     manual_training = False
-    history = model.fit(X, y, batch_size=batch_size, nb_epoch=500, validation_data=(X_test, y_test), shuffle=False)
- 
-    # Test manual training
-    # we need a manual history dict with 'acc', 'val_acc', 'loss' and 'val_loss' keys
-    """
-    manual_training = True
-    history = {}
-    history['acc'] = []
-    history['val_acc'] = []
-    history['loss'] = []
-    history['val_loss'] = []
-    for i in range(1000):
-        print 'epoch: ', i
-        hist = model.fit(X, y, nb_epoch=1, batch_size=batch_size, shuffle=False, validation_data=(X_test, y_test))
-        history['acc'].append(hist.history['acc'])
-        history['val_acc'].append(hist.history['val_acc'])
-        history['loss'].append(hist.history['loss'])
-        history['val_loss'].append(hist.history['val_loss'])
-        model.reset_states()
-    """
+    history = model.fit(X, y, batch_size=batch_size, nb_epoch=500, validation_data=(X_test, y_test), shuffle=False) 
+    
     print 'Saving model...'
     sys.stdout.flush()
     save_model(model)
