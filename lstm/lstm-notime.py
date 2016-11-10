@@ -150,10 +150,9 @@ def main(argv):
     sys.stdout.flush()
     batch_size = 1
     model = Sequential()
-    model.add(LSTM(512, return_sequences=False, stateful=False, dropout_W=0.2, dropout_U=0.2, batch_input_shape=(batch_size, max_sequence_length, ACTION_MAX_LENGHT)))
-    #model.add(LSTM(512, return_sequences=False, stateful=True, batch_input_shape=(batch_size, max_sequence_length, ACTION_MAX_LENGHT)))
+    model.add(LSTM(512, return_sequences=True, stateful=False, dropout_W=0.2, dropout_U=0.2, batch_input_shape=(batch_size, max_sequence_length, ACTION_MAX_LENGHT)))
     #model.add(Dropout(0.8))
-    #model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2))
+    model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2))
     #model.add(Dropout(0.8))
     model.add(Dense(total_activities))
     model.add(Activation('softmax'))
