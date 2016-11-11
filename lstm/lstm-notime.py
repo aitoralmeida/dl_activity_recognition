@@ -131,30 +131,9 @@ def main(argv):
     # Use sequence padding for training samples
     X = pad_sequences(X, maxlen=ACTIVITY_MAX_LENGHT, dtype='float32')
     # Tranform class labels to one-hot encoding
-    y = np_utils.to_categorical(y)
-    
+    y = np_utils.to_categorical(y)    
 
-    """
-    # Old data framing
-    print 'Preparing training set...'
-    print '  - Reading dataset'
-    sys.stdout.flush()
-    with open(DATASET_NO_TIME, 'r') as dataset_file:
-        activities = json.load(dataset_file)
-    print '  - processing activities'
-    X = []
-    y = []
-    for i, activity in enumerate(activities):
-        if i % 100 == 0:
-            print '  - Number of activities processed:', i
-            sys.stdout.flush()
-        actions = []
-        for action in activity['actions']:
-            actions.append(np.array(action))
-        X.append(np.array(actions))
-        y.append(np.array(activity['activity']))
     
-    """
     total_examples = len(X)
     test_per = 0.2
     limit = int(test_per * total_examples)

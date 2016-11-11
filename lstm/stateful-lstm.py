@@ -20,6 +20,7 @@ from keras.models import model_from_json
 from keras.layers import Dense, Activation, Dropout
 from keras.layers import LSTM
 from keras.utils import np_utils
+from keras.preprocessing.sequence import pad_sequences
 
 import numpy as np
 
@@ -92,7 +93,53 @@ def plot_training_info(metrics, save, history):
             plt.gcf().clear()
         else:
             plt.show()
+  
+"""
+Function to prepare the dataset with individual sequences (simple framing)
+"""
+
+def prepare_indiv_sequences(df, action_vectors, unique_activities, activity_to_int):
+    print 'Preparing training set...'
+
+    X = []
+    y = []    
+    
+    for index in df.index:
+        action = df.loc[index, 'action']        
+        X.append(np.array(action_vectors[action]))
+        y.append(activity_to_int[df.loc[index, 'activity']])
+    
+    y = np_utils.to_categorical(y)
+    
+    return X, y
+    
+def prepare_variable_sequences(df, action_vectors, unique_activities, activity_to_int):
+    # New data framing
+    print 'Preparing training set...'
+
+    X = []
+    y = []    
+    
+    current_activity = ""
+    actions = []
+    for index in df.index:
+        action = df.loc[index, 'action']        
+        actions.append(np.array(action_vectors[action]))
         
+        if current_activity != df.loc[index, 'activity']:
+            current_activity = df.loc[index, 'activity']
+            if len(actions) > 0:
+                X.append(actions)
+                y.append(activity_to_int[df.loc[index, 'activity']])
+                actions = []
+
+    # Use sequence padding for training samples
+    X = pad_sequences(X, maxlen=ACTIVITY_MAX_LENGHT, dtype='float32')
+    # Tranform class labels to one-hot encoding
+    y = np_utils.to_categorical(y)
+    
+    return X, y
+    
     
 def main(argv):
     # Load dataset from csv file
@@ -104,21 +151,22 @@ def main(argv):
     action_vectors = json.load(open(ACTION_VECTORS, 'r'))
 
     print 'Preparing training set...'
-
-    X = []
-    y = []
     
     # Generate the dict to transform activities to integer numbers
     activity_to_int = dict((c, i) for i, c in enumerate(unique_activities))
     # Generate the dict to transform integer numbers to activities
     int_to_activity = dict((i, c) for i, c in enumerate(unique_activities))
+
     
-    for index in df_dataset.index:
-        action = df_dataset.loc[index, 'action']        
-        X.append(np.array(action_vectors[action]))
-        y.append(activity_to_int[df_dataset.loc[index, 'activity']])
+    # Test the simple problem framing
+    #X, y = prepare_indiv_sequences(df_dataset, action_vectors, unique_activities, activity_to_int)
+    #variable = False
     
-    y = np_utils.to_categorical(y)
+    # Test the varaible sequence problem framing approach
+    # Remember to change batch_input_size in consequence
+    X, y = prepare_variable_sequences(df_dataset, action_vectors, unique_activities, activity_to_int)
+    variable = True
+    
     total_examples = len(X)
     test_per = 0.2
     limit = int(test_per * total_examples)
@@ -142,7 +190,11 @@ def main(argv):
     check_activity_distribution(y_test, unique_activities)
 
     # reshape X and X_test to be [samples, time steps, features]
-    time_steps = 1
+    if variable == True:
+        time_steps = ACTIVITY_MAX_LENGHT
+    else:    
+        time_steps = 1
+        
     X = X.reshape(X.shape[0], time_steps, ACTION_MAX_LENGHT)
     X_test = X_test.reshape(X_test.shape[0], time_steps, ACTION_MAX_LENGHT)
     print 'Shape (X,y):'
