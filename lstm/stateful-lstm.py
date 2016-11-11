@@ -168,7 +168,7 @@ def main(argv):
     variable = True
     
     total_examples = len(X)
-    test_per = 0.2
+    test_per = 0 #0.2
     limit = int(test_per * total_examples)
     X_train = X[limit:]
     X_test = X[:limit]
@@ -211,6 +211,7 @@ def main(argv):
     batch_size = 1
     model = Sequential()
     # Test with Stateful layers
+    # I read that batch_input_size=(batch_size, None, features) can be used for variable length sequences
     model.add(LSTM(512, return_sequences=False, stateful=True, dropout_W=0.2, dropout_U=0.2, batch_input_shape=(batch_size, X.shape[1], X.shape[2])))
     #model.add(LSTM(512, return_sequences=False, stateful=True, batch_input_shape=(batch_size, max_sequence_length, ACTION_MAX_LENGHT)))
     #model.add(Dropout(0.8))
@@ -237,22 +238,31 @@ def main(argv):
     history['val_loss'] = []
     for i in range(1000):
         print 'epoch: ', i
+        model.fit(X, y, nb_epoch=1, batch_size=batch_size, shuffle=False)
+        """
         hist = model.fit(X, y, nb_epoch=1, batch_size=batch_size, shuffle=False, validation_data=(X_test, y_test))
         history['acc'].append(hist.history['acc'])
         history['val_acc'].append(hist.history['val_acc'])
         history['loss'].append(hist.history['loss'])
         history['val_loss'].append(hist.history['val_loss'])
+        """
         model.reset_states()
  
     print 'Saving model...'
     sys.stdout.flush()
     save_model(model)
     print 'Model saved'
+    
+    # summarize performance of the model testing the evaluate function
+    scores = model.evaluate(X, y, verbose=0)
+    print("Model Accuracy: %.2f%%" % (scores[1]*100))
+    
+    """
     if manual_training == True:
         plot_training_info(['accuracy', 'loss'], True, history)
     else:
         plot_training_info(['accuracy', 'loss'], True, history.history)
-
+    """
 
 if __name__ == "__main__":
    main(sys.argv)
