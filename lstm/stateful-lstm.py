@@ -236,7 +236,7 @@ def main(argv):
     history['val_acc'] = []
     history['loss'] = []
     history['val_loss'] = []
-    for i in range(1000):
+    for i in range(500):
         print 'epoch: ', i
         model.fit(X, y, nb_epoch=1, batch_size=batch_size, shuffle=False)
         """
