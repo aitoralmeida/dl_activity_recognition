@@ -236,7 +236,7 @@ def main(argv):
     history['val_acc'] = []
     history['loss'] = []
     history['val_loss'] = []
-    for i in range(500):
+    for i in range(10):
         print 'epoch: ', i
         model.fit(X, y, nb_epoch=1, batch_size=batch_size, shuffle=False)
         """
@@ -254,7 +254,7 @@ def main(argv):
     print 'Model saved'
     
     # summarize performance of the model testing the evaluate function
-    scores = model.evaluate(X, y, verbose=0)
+    scores = model.evaluate(X_test, y_test, batch_size=batch_size, verbose=0)
     print("Model Accuracy: %.2f%%" % (scores[1]*100))
     
     """
