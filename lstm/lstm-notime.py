@@ -177,8 +177,9 @@ def main(argv):
     #model.add(Dropout(0.8))
     model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2))
     #model.add(Dropout(0.8))
-    model.add(Dense(total_activities))
-    model.add(Activation('softmax'))
+    model.add(Dense(100, activation='relu'))
+    #model.add(Activation('softmax'))
+    model.add(Dense(total_activities, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'mse', 'mae'])
     print 'Model built'
     print(model.summary())
