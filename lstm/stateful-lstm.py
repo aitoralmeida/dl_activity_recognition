@@ -273,7 +273,7 @@ def main(argv):
     # for stateful LSTMs. We train and test batch per batch
     max_len = X.shape[1]
     print 'max length:', max_len
-    epochs = 10
+    epochs = 100
     for epoch in range(epochs):
         print '***************'
         print 'Epoch', epoch, '/', epochs
