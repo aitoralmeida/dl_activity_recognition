@@ -8,6 +8,7 @@ Created on Tue Oct 25 16:16:52 2016
 from collections import Counter
 import json
 import sys
+from copy import deepcopy
 
 import matplotlib
 matplotlib.use('Agg')
@@ -42,6 +43,9 @@ ACTIVITY_MAX_LENGHT = 32
 ACTION_MAX_LENGHT = 50
 
 
+
+
+
 def save_model(model):
     json_string = model.to_json()
     model_name = 'model_activity_lstm'
@@ -58,6 +62,42 @@ def check_activity_distribution(y_np, unique_activities):
         index = activity_np.tolist().index(1.0)
         activities.append(unique_activities[index])
     print Counter(activities)
+    
+def prepare_variable_sequences(df, action_vectors, unique_activities, activity_to_int):
+    X = []
+    y = []    
+    
+    current_activity = ""
+    actions = []
+    aux_actions = []
+    for index in df.index:        
+        if current_activity == "":
+            current_activity = df.loc[index, 'activity']
+            
+        
+        if current_activity != df.loc[index, 'activity']:
+            y.append(activity_to_int[current_activity])
+            X.append(actions)            
+            #print current_activity, aux_actions
+            current_activity = df.loc[index, 'activity']
+            # reset auxiliary variables
+            actions = []
+            aux_actions = []
+        
+        action = df.loc[index, 'action']
+        #print 'Current action: ', action
+        actions.append(np.array(action_vectors[action]))
+        aux_actions.append(action)
+        
+    # Append the last activity
+    y.append(activity_to_int[current_activity])
+    X.append(actions)
+    
+    # Use sequence padding for training samples
+    X = pad_sequences(X, maxlen=ACTIVITY_MAX_LENGHT, dtype='float32')    
+        
+    return X, y
+    
     
 """
 Function to plot accurary and loss during training
@@ -97,7 +137,7 @@ def plot_training_info(metrics, save, history):
         
     
 def main(argv):
-    """
+    
     # Load dataset from csv file
     df_dataset = pd.read_csv(DATASET_CSV, parse_dates=[[0, 1]], header=None, index_col=0, sep=' ')
     df_dataset.columns = ['sensor', 'action', 'event', 'activity']
@@ -106,16 +146,65 @@ def main(argv):
     total_activities = len(unique_activities)
     action_vectors = json.load(open(ACTION_VECTORS, 'r'))
     
+    # Generate the dict to transform activities to integer numbers
+    activity_to_int = dict((c, i) for i, c in enumerate(unique_activities))
+    # Generate the dict to transform integer numbers to activities
+    int_to_activity = dict((i, c) for i, c in enumerate(unique_activities))
+
+    # Prepare padded variable sequences for activities
+    # This data framing approach assumes a perfect segmentation of actions for activities
+    X, y = prepare_variable_sequences(df_dataset, action_vectors, unique_activities, activity_to_int)    
+    
+    # Keep original y (with activity indices) before transforming it to categorical
+    y_orig = deepcopy(y)
+    # Tranform class labels to one-hot encoding
+    y = np_utils.to_categorical(y)
+    
+    
+    # Prepare training and testing datasets
+    total_examples = len(X)
+    test_per = 0.2
+    limit = int(test_per * total_examples)
+    #======================================================
+    # Be careful here! Training set is built from limit
+    # Take into account for visualizations!
+    #======================================================
+    X_train = X[limit:]
+    X_test = X[:limit]
+    y_train = y[limit:]
+    y_test = y[:limit]
+    print 'Total examples:', total_examples
+    print 'Train examples:', len(X_train), len(y_train) 
+    print 'Test examples:', len(X_test), len(y_test)
+    sys.stdout.flush()  
+    X = np.array(X_train)
+    y = np.array(y_train)
+    print 'Activity distribution for training:'
+    check_activity_distribution(y, unique_activities)
+    #X = X.reshape(X.shape[0], 1, ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)
+    X_test = np.array(X_test)
+    y_test = np.array(y_test)    
+
+    print 'Activity distribution for testing:'
+    check_activity_distribution(y_test, unique_activities)
+
+    #X_test = X_test.reshape(X_test.shape[0], 1, ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT) # For multichannel CNN
+    X = X.reshape(X.shape[0], ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)
+    X_test = X_test.reshape(X_test.shape[0], ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)
+    print 'Shape (X,y):'
+    print X.shape
+    print y.shape
+    print 'Training set prepared'  
+    sys.stdout.flush()
+    
+    """
     # New data framing
     print 'Preparing training set...'
 
     X = []
     y = []
     
-    # Generate the dict to transform activities to integer numbers
-    activity_to_int = dict((c, i) for i, c in enumerate(unique_activities))
-    # Generate the dict to transform integer numbers to activities
-    int_to_activity = dict((i, c) for i, c in enumerate(unique_activities))
+    
 
     current_activity = ""
     actions = []
