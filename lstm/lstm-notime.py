@@ -225,7 +225,7 @@ def main(argv):
     
     print 'Building model...'
     sys.stdout.flush()
-    batch_size = 1
+    batch_size = 16
     model = Sequential()
     model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2, input_shape=(ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)))
     #model.add(Dropout(0.8))
