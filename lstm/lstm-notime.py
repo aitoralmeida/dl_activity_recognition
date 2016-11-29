@@ -28,6 +28,7 @@ import numpy as np
 DIR = '../sensor2vec/kasteren_dataset/'
 # Dataset with vectors but without the action timestamps
 DATASET_CSV = DIR + 'base_kasteren_reduced.csv'
+DATASET_NO_TIME = DIR + 'dataset_no_time.json'
 # List of unique activities in the dataset
 UNIQUE_ACTIVITIES = DIR + 'unique_activities.json'
 # List of unique actions in the dataset
