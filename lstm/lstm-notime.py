@@ -195,67 +195,8 @@ def main(argv):
     print X.shape
     print y.shape
     print 'Training set prepared'  
-    sys.stdout.flush()
-    
-    """
-    # New data framing
-    print 'Preparing training set...'
+    sys.stdout.flush()   
 
-    X = []
-    y = []
-    
-    
-
-    current_activity = ""
-    actions = []
-    for index in df_dataset.index:
-        action = df_dataset.loc[index, 'action']        
-        actions.append(np.array(action_vectors[action]))
-        
-        if current_activity != df_dataset.loc[index, 'activity']:
-            current_activity = df_dataset.loc[index, 'activity']
-            if len(actions) > 0:
-                X.append(actions)
-                y.append(activity_to_int[df_dataset.loc[index, 'activity']])
-                actions = []
-
-    # Use sequence padding for training samples
-    X = pad_sequences(X, maxlen=ACTIVITY_MAX_LENGHT, dtype='float32')
-    # Tranform class labels to one-hot encoding
-    y = np_utils.to_categorical(y)    
-
-    
-    total_examples = len(X)
-    test_per = 0.2
-    limit = int(test_per * total_examples)
-    X_train = X[limit:]
-    X_test = X[:limit]
-    y_train = y[limit:]
-    y_test = y[:limit]
-    print 'Total examples:', total_examples
-    print 'Train examples:', len(X_train), len(y_train) 
-    print 'Test examples:', len(X_test), len(y_test)
-    sys.stdout.flush()  
-    X = np.array(X_train)
-    y = np.array(y_train)
-    print 'Activity distribution for training:'
-    check_activity_distribution(y, unique_activities)
-    #X = X.reshape(X.shape[0], 1, ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)
-    X_test = np.array(X_test)
-    y_test = np.array(y_test)    
-
-    print 'Activity distribution for testing:'
-    check_activity_distribution(y_test, unique_activities)
-
-    #X_test = X_test.reshape(X_test.shape[0], 1, ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT) # For multichannel CNN
-    X = X.reshape(X.shape[0], ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)
-    X_test = X_test.reshape(X_test.shape[0], ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)
-    print 'Shape (X,y):'
-    print X.shape
-    print y.shape
-    print 'Training set prepared'  
-    sys.stdout.flush()
-    """
     
     unique_activities = json.load(open(UNIQUE_ACTIVITIES, 'r'))
     total_activities = len(unique_activities)
