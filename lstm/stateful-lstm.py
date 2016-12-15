@@ -122,19 +122,33 @@ def prepare_variable_sequences(df, action_vectors, unique_activities, activity_t
     
     current_activity = ""
     actions = []
-    for index in df.index:
-        action = df.loc[index, 'action']        
-        actions.append(np.array(action_vectors[action]))
+    aux_actions = []
+    for index in df.index:        
+        if current_activity == "":
+            current_activity = df.loc[index, 'activity']
+            
         
         if current_activity != df.loc[index, 'activity']:
+            y.append(activity_to_int[current_activity])
+            X.append(actions)            
+            #print current_activity, aux_actions
             current_activity = df.loc[index, 'activity']
-            if len(actions) > 0:
-                X.append(actions)
-                y.append(activity_to_int[df.loc[index, 'activity']])
-                actions = []
-
+            # reset auxiliary variables
+            actions = []
+            aux_actions = []
+        
+        action = df.loc[index, 'action']
+        #print 'Current action: ', action
+        actions.append(np.array(action_vectors[action]))
+        aux_actions.append(action)
+        
+    # Append the last activity
+    y.append(activity_to_int[current_activity])
+    X.append(actions)
+    
     # Use sequence padding for training samples
-    X = pad_sequences(X, maxlen=ACTIVITY_MAX_LENGHT, dtype='float32')
+    X = pad_sequences(X, maxlen=ACTIVITY_MAX_LENGHT, dtype='float32')        
+    
     # Tranform class labels to one-hot encoding
     y = np_utils.to_categorical(y)
     

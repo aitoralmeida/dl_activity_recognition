@@ -8,6 +8,7 @@ Created on Tue Oct 25 16:16:52 2016
 from collections import Counter
 import json
 import sys
+from copy import deepcopy
 
 import matplotlib
 matplotlib.use('Agg')
@@ -28,6 +29,7 @@ import numpy as np
 DIR = '../sensor2vec/kasteren_dataset/'
 # Dataset with vectors but without the action timestamps
 DATASET_CSV = DIR + 'base_kasteren_reduced.csv'
+DATASET_NO_TIME = DIR + 'dataset_no_time.json'
 # List of unique activities in the dataset
 UNIQUE_ACTIVITIES = DIR + 'unique_activities.json'
 # List of unique actions in the dataset
@@ -39,6 +41,9 @@ ACTION_VECTORS = DIR + 'actions_vectors.json'
 ACTIVITY_MAX_LENGHT = 32
 # Number of dimensions of an action vector
 ACTION_MAX_LENGHT = 50
+
+
+
 
 
 def save_model(model):
@@ -57,6 +62,42 @@ def check_activity_distribution(y_np, unique_activities):
         index = activity_np.tolist().index(1.0)
         activities.append(unique_activities[index])
     print Counter(activities)
+    
+def prepare_variable_sequences(df, action_vectors, unique_activities, activity_to_int):
+    X = []
+    y = []    
+    
+    current_activity = ""
+    actions = []
+    aux_actions = []
+    for index in df.index:        
+        if current_activity == "":
+            current_activity = df.loc[index, 'activity']
+            
+        
+        if current_activity != df.loc[index, 'activity']:
+            y.append(activity_to_int[current_activity])
+            X.append(actions)            
+            #print current_activity, aux_actions
+            current_activity = df.loc[index, 'activity']
+            # reset auxiliary variables
+            actions = []
+            aux_actions = []
+        
+        action = df.loc[index, 'action']
+        #print 'Current action: ', action
+        actions.append(np.array(action_vectors[action]))
+        aux_actions.append(action)
+        
+    # Append the last activity
+    y.append(activity_to_int[current_activity])
+    X.append(actions)
+    
+    # Use sequence padding for training samples
+    X = pad_sequences(X, maxlen=ACTIVITY_MAX_LENGHT, dtype='float32')    
+        
+    return X, y
+    
     
 """
 Function to plot accurary and loss during training
@@ -96,7 +137,7 @@ def plot_training_info(metrics, save, history):
         
     
 def main(argv):
-    """
+    
     # Load dataset from csv file
     df_dataset = pd.read_csv(DATASET_CSV, parse_dates=[[0, 1]], header=None, index_col=0, sep=' ')
     df_dataset.columns = ['sensor', 'action', 'event', 'activity']
@@ -105,39 +146,29 @@ def main(argv):
     total_activities = len(unique_activities)
     action_vectors = json.load(open(ACTION_VECTORS, 'r'))
     
-    # New data framing
-    print 'Preparing training set...'
-
-    X = []
-    y = []
-    
     # Generate the dict to transform activities to integer numbers
     activity_to_int = dict((c, i) for i, c in enumerate(unique_activities))
     # Generate the dict to transform integer numbers to activities
     int_to_activity = dict((i, c) for i, c in enumerate(unique_activities))
 
-    current_activity = ""
-    actions = []
-    for index in df_dataset.index:
-        action = df_dataset.loc[index, 'action']        
-        actions.append(np.array(action_vectors[action]))
-        
-        if current_activity != df_dataset.loc[index, 'activity']:
-            current_activity = df_dataset.loc[index, 'activity']
-            if len(actions) > 0:
-                X.append(actions)
-                y.append(activity_to_int[df_dataset.loc[index, 'activity']])
-                actions = []
-
-    # Use sequence padding for training samples
-    X = pad_sequences(X, maxlen=ACTIVITY_MAX_LENGHT, dtype='float32')
-    # Tranform class labels to one-hot encoding
-    y = np_utils.to_categorical(y)    
-
+    # Prepare padded variable sequences for activities
+    # This data framing approach assumes a perfect segmentation of actions for activities
+    X, y = prepare_variable_sequences(df_dataset, action_vectors, unique_activities, activity_to_int)    
     
+    # Keep original y (with activity indices) before transforming it to categorical
+    y_orig = deepcopy(y)
+    # Tranform class labels to one-hot encoding
+    y = np_utils.to_categorical(y)
+    
+    
+    # Prepare training and testing datasets
     total_examples = len(X)
     test_per = 0.2
     limit = int(test_per * total_examples)
+    #======================================================
+    # Be careful here! Training set is built from limit
+    # Take into account for visualizations!
+    #======================================================
     X_train = X[limit:]
     X_test = X[:limit]
     y_train = y[limit:]
@@ -164,8 +195,8 @@ def main(argv):
     print X.shape
     print y.shape
     print 'Training set prepared'  
-    sys.stdout.flush()
-    """
+    sys.stdout.flush()   
+
     
     unique_activities = json.load(open(UNIQUE_ACTIVITIES, 'r'))
     total_activities = len(unique_activities)
@@ -224,7 +255,7 @@ def main(argv):
     
     print 'Building model...'
     sys.stdout.flush()
-    batch_size = 1
+    batch_size = 16
     model = Sequential()
     model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2, input_shape=(ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)))
     #model.add(Dropout(0.8))
