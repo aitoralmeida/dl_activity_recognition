@@ -197,59 +197,6 @@ def main(argv):
     print 'Training set prepared'  
     sys.stdout.flush()   
 
-    
-    unique_activities = json.load(open(UNIQUE_ACTIVITIES, 'r'))
-    total_activities = len(unique_activities)
-
-    print 'Preparing training set...'
-    print '  - Reading dataset'
-    sys.stdout.flush()
-    with open(DATASET_NO_TIME, 'r') as dataset_file:
-        activities = json.load(dataset_file)
-    print '  - processing activities'
-    X = []
-    y = []
-    for i, activity in enumerate(activities):
-        if i % 10000 == 0:
-            print '  - Number of activities processed:', i
-            sys.stdout.flush()
-        actions = []
-        for action in activity['actions']:
-            actions.append(np.array(action))
-    
-        actions_array = np.array(actions)
-        X.append(actions_array)
-        y.append(np.array(activity['activity']))
-    
-    total_examples = len(X)
-    test_per = 0.2
-    limit = int(test_per * total_examples)
-    X_train = X[limit:]
-    X_test = X[:limit]
-    y_train = y[limit:]
-    y_test = y[:limit]
-    print 'Total examples:', total_examples
-    print 'Train examples:', len(X_train), len(y_train) 
-    print 'Test examples:', len(X_test), len(y_test)
-    sys.stdout.flush()  
-    X = np.array(X_train)
-    y = np.array(y_train)
-    print 'Activity distribution for training:'
-    check_activity_distribution(y, unique_activities)
-    #X = X.reshape(X.shape[0], 1, ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)
-    X = X.reshape(X.shape[0], ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)
-
-    X_test = np.array(X_test)
-    y_test = np.array(y_test)
-    print 'Activity distribution for testing:'
-    check_activity_distribution(y_test, unique_activities)
-    #X_test = X_test.reshape(X_test.shape[0], 1, ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)
-    X_test = X_test.reshape(X_test.shape[0], ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)
-    print 'Shape (X,y):'
-    print X.shape
-    print y.shape
-    print 'Training set prepared'
-
     # Build the model
     max_sequence_length = ACTIVITY_MAX_LENGHT
     
@@ -257,13 +204,14 @@ def main(argv):
     sys.stdout.flush()
     batch_size = 16
     model = Sequential()
-    model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2, input_shape=(ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)))
+    model.add(LSTM(128, return_sequences=False, dropout_W=0.4, dropout_U=0.4, input_shape=(ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)))
     #model.add(Dropout(0.8))
     #model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2))
     #model.add(Dropout(0.8))
     model.add(Dense(total_activities))
     model.add(Activation('softmax'))
-    #model.add(Dense(total_activities, activation='softmax'))
+
+    
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'mse', 'mae'])
     print 'Model built'
     print(model.summary())
@@ -274,7 +222,7 @@ def main(argv):
     sys.stdout.flush()
     # Automatic training for Stateless LSTM
     manual_training = False
-    history = model.fit(X, y, batch_size=batch_size, nb_epoch=500, validation_data=(X_test, y_test), shuffle=False) 
+    history = model.fit(X, y, batch_size=batch_size, nb_epoch=1000, validation_data=(X_test, y_test), shuffle=False)
     
     print 'Saving model...'
     sys.stdout.flush()
