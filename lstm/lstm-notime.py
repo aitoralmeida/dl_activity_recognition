@@ -203,8 +203,43 @@ def prepare_embeddings(df, activity_to_int, delta = 0):
     else:
         # TODO: use delta value as the time slice for action segmentation
         # as Kasteren et al.
-        print "Not implemented yet!"
+        print 'prepare_embeddings: delta value =', delta
+        
+        current_index = df.index[0]
+        last_index = df.index[len(df) - 1]
+        i = 0
+        while current_index < last_index:
+            print 'prepare_embeddings: inside while', i
+            print 'prepare_embeddings: current index', current_index
+            i = i + 1
+            actionsdf = []
+            
+            auxdf = df.iloc[np.logical_and(df.index >= current_index, df.index < current_index + pd.DateOffset(seconds=delta))]
+            print 'auxdf'
+            print auxdf
+                        
+            first = df.index.get_loc(auxdf.index[0])
+            last = df.index.get_loc(auxdf.index[len(auxdf)-1])
+            print 'First:', first, 'Last:', last
+            if first == last:
+                actionsdf.append(np.array(trans_actions[first]))
+            else:
+                for i in xrange(first, last):            
+                    actionsdf.append(np.array(trans_actions[i]))
+            
+            X.append(actionsdf)
+            # Find the dominant activity in the time slice of auxdf
+            activity = auxdf['activity'].value_counts().idxmax()
+            y.append(activity_to_int[activity])
+            
+            # Update current_index            
+            pos = df.index.get_loc(auxdf.index[len(auxdf)-1])
+            current_index = df.index[pos+1]
+            
+            
+        print "To be tested!"
     
+    print X    
     # Pad sequences
     X = pad_sequences(X, maxlen=ACTIVITY_MAX_LENGHT, dtype='float32') 
     
@@ -258,7 +293,8 @@ def main(argv):
     # Prepare sequences using action indices
     # Each action will be an index which will point to an action vector
     # in the weights matrix of the Embedding layer of the network input
-    X, y, tokenizer = prepare_embeddings(df_dataset, activity_to_int)
+    # Use 'delta' to establish slicing time; if 0, slicing done on activity type basis
+    X, y, tokenizer = prepare_embeddings(df_dataset, activity_to_int, delta=60)
     """
     for i in range(10):
         print '-----------------------'
