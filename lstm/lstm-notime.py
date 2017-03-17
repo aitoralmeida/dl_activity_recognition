@@ -43,9 +43,9 @@ ACTION_VECTORS = DIR + 'actions_vectors.json'
 WORD2VEC_MODEL = DIR + 'actions.model'
 
 # Maximun number of actions in an activity
-ACTIVITY_MAX_LENGHT = 32
+ACTIVITY_MAX_LENGTH = 32
 # Number of dimensions of an action vector
-ACTION_MAX_LENGHT = 50
+ACTION_MAX_LENGTH = 50
 
 
 
@@ -99,7 +99,7 @@ def prepare_variable_sequences(df, action_vectors, unique_activities, activity_t
     X.append(actions)
     
     # Use sequence padding for training samples
-    X = pad_sequences(X, maxlen=ACTIVITY_MAX_LENGHT, dtype='float32')    
+    X = pad_sequences(X, maxlen=ACTIVITY_MAX_LENGTH, dtype='float32')    
         
     return X, y
     
@@ -208,6 +208,7 @@ def prepare_embeddings(df, activity_to_int, delta = 0):
         current_index = df.index[0]
         last_index = df.index[len(df) - 1]
         i = 0
+        DYNAMIC_MAX_LENGTH = 0
         while current_index < last_index:
             print 'prepare_embeddings: inside while', i
             print 'prepare_embeddings: current index', current_index
@@ -227,6 +228,9 @@ def prepare_embeddings(df, activity_to_int, delta = 0):
                 for i in xrange(first, last):            
                     actionsdf.append(np.array(trans_actions[i]))
             
+            if len(actionsdf) > DYNAMIC_MAX_LENGTH:
+                DYNAMIC_MAX_LENGTH = len(actionsdf)
+                
             X.append(actionsdf)
             # Find the dominant activity in the time slice of auxdf
             activity = auxdf['activity'].value_counts().idxmax()
@@ -239,18 +243,24 @@ def prepare_embeddings(df, activity_to_int, delta = 0):
             
         print "To be tested!"
     
-    print X    
+
     # Pad sequences
-    X = pad_sequences(X, maxlen=ACTIVITY_MAX_LENGHT, dtype='float32') 
+    max_sequence_length = 0
+    if delta != 0:
+        X = pad_sequences(X, maxlen=DYNAMIC_MAX_LENGTH, dtype='float32')
+        max_sequence_length = DYNAMIC_MAX_LENGTH
+    else:            
+        X = pad_sequences(X, maxlen=ACTIVITY_MAX_LENGTH, dtype='float32')
+        max_sequence = ACTIVITY_MAX_LENGTH
     
-    return X, y, tokenizer
+    return X, y, tokenizer, max_sequence_length
 
 # Function to create the embedding matrix, which will be used to initialize
 # the embedding layer of the network
 def create_embedding_matrix(tokenizer):
     model = Word2Vec.load(WORD2VEC_MODEL)    
     action_index = tokenizer.word_index
-    embedding_matrix = np.zeros((len(action_index) + 1, ACTION_MAX_LENGHT))
+    embedding_matrix = np.zeros((len(action_index) + 1, ACTION_MAX_LENGTH))
     unknown_words = {}    
     for action, i in action_index.items():
         try:            
@@ -294,7 +304,8 @@ def main(argv):
     # Each action will be an index which will point to an action vector
     # in the weights matrix of the Embedding layer of the network input
     # Use 'delta' to establish slicing time; if 0, slicing done on activity type basis
-    X, y, tokenizer = prepare_embeddings(df_dataset, activity_to_int, delta=60)
+    delta = 60 # To test the same time slicing as Kasteren
+    X, y, tokenizer, max_sequence_length = prepare_embeddings(df_dataset, activity_to_int, delta=delta)
     """
     for i in range(10):
         print '-----------------------'
@@ -340,8 +351,8 @@ def main(argv):
     check_activity_distribution(y_test, unique_activities)
 
     # Reshape for using with static action vectors
-    #X = X.reshape(X.shape[0], ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)
-    #X_test = X_test.reshape(X_test.shape[0], ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)
+    #X = X.reshape(X.shape[0], ACTIVITY_MAX_LENGTH, ACTION_MAX_LENGTH)
+    #X_test = X_test.reshape(X_test.shape[0], ACTIVITY_MAX_LENGTH, ACTION_MAX_LENGTH)
     # If we are using an Embedding layer, there is no need to reshape
     print 'Shape (X,y):'
     print X.shape
@@ -350,16 +361,15 @@ def main(argv):
     sys.stdout.flush()   
 
     # Build the model
-    max_sequence_length = ACTIVITY_MAX_LENGHT
-    
+       
     print 'Building model...'
     sys.stdout.flush()
     batch_size = 16
     model = Sequential()
-    #model.add(Input(shape=(ACTIVITY_MAX_LENGHT,), dtype='int32'))
-    model.add(Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=ACTIVITY_MAX_LENGHT, trainable=True))
+    #model.add(Input(shape=(ACTIVITY_MAX_LENGTH,), dtype='int32'))
+    model.add(Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=max_sequence_length, trainable=True))
     # Change input shape when using embeddings
-    model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2, input_shape=(ACTIVITY_MAX_LENGHT, ACTION_MAX_LENGHT)))
+    model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2, input_shape=(max_sequence_length, ACTION_MAX_LENGTH)))
     #model.add(Dropout(0.8))
     #model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2))
     #model.add(Dropout(0.8))
