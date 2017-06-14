@@ -1,0 +1,22 @@
+In the file "data"
+
+- I had to remove double spaces.
+- I had to convert tab to simple spaces.
+- In line 2010-12-13 12:38:55.759074 I substituted a temperature value of 285 to 28.5.
+- In line 2010-12-18 20:32:58.686535 I substituted a temperature value of 245 to 24.5.
+- In line 2010-12-18 22:09:01.764377 I substituted a temperature value of 225 to 22.5.
+
+- After those cleaning steps, the temperature distribution is (look at "temperature_histogram.png"):
+  Mean: 23.01
+  Median: 23.0
+  Standard deviation: 3.02
+  Max: 43.0 (sensor failure?)
+  Min: 16.0
+
+  Number and percentage of temperature values above 30.0: 2820, 2.42%
+  Number and percentage of temperature values above 35.0: 169, 0.145%
+
+- I detected some sensor names such as LEAVEHOME and ENTERHOME. They do not make any sense, so I will remove them manually, since they are few examples.
+  * Special case: line 2011-05-10 18:42:45.169231 contains a 'c' as sensor name but a value 'OFF'. It seems it is a motion sensor, more concretely M014, which gets activated in the line above. I changed 'c' by 'M014'
+
+- I detected values like "OFFcc", "22.5cc" etc. Numeric values are already clean, but the others are to be cleaned yet. There are a lot of them. -> I implemented some code to detect those non-valid values, compute their similarity to valid ones (ON, OFF, OPEN, CLOSE), and substitue by the valid ones (145 rows modified; look at "weird_values.txt" to check the substituted rows)

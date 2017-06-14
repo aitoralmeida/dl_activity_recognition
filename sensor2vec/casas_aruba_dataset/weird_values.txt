@@ -1,0 +1,870 @@
+sensor      M020
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 09:42:01.868596, dtype: object
+   changed to ON
+sensor      M019
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 09:44:09.502301, dtype: object
+   changed to ON
+sensor      M021
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 09:46:03.153333, dtype: object
+   changed to OFF
+sensor      M012
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 09:50:05.056768, dtype: object
+   changed to ON
+sensor      M012
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 09:57:01.039203, dtype: object
+   changed to OFF
+sensor      M021
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 09:57:25.888599, dtype: object
+   changed to ON
+sensor      M019
+value       OFF5
+activity     NaN
+event        NaN
+Name: 2010-12-13 09:57:57.106443, dtype: object
+   changed to OFF
+sensor      M019
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 09:58:02.905089, dtype: object
+   changed to OFF
+sensor      M015
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 09:58:48.760742, dtype: object
+   changed to OFF
+sensor      M018
+value       OFF5
+activity     NaN
+event        NaN
+Name: 2010-12-13 09:59:09.217390, dtype: object
+   changed to OFF
+sensor      M019
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 09:59:22.497678, dtype: object
+   changed to OFF
+sensor      M019
+value       OFcF
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:00:12.460282, dtype: object
+   changed to OFF
+sensor      M015
+value        ON5
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:00:45.376279, dtype: object
+   changed to ON
+sensor      M015
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:00:51.043461, dtype: object
+   changed to ON
+sensor      M019
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:01:29.613640, dtype: object
+   changed to ON
+sensor      M015
+value        ON5
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:01:58.621065, dtype: object
+   changed to ON
+sensor      M015
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:02:05.401094, dtype: object
+   changed to OFF
+sensor      M015
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:03:10.063195, dtype: object
+   changed to ON
+sensor      M019
+value       OFF5
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:03:45.321400, dtype: object
+   changed to OFF
+sensor      M019
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:04:11.940637, dtype: object
+   changed to ON
+sensor      M015
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:05:04.099588, dtype: object
+   changed to OFF
+sensor      M016
+value       ON55
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:05:49.543105, dtype: object
+   changed to ON
+sensor      M016
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:05:53.371215, dtype: object
+   changed to OFF
+sensor      M015
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:06:33.812134, dtype: object
+   changed to OFF
+sensor      M018
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:07:06.072021, dtype: object
+   changed to ON
+sensor      M010
+value        ON5
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:08:36.700325, dtype: object
+   changed to ON
+sensor      M010
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:09:01.144883, dtype: object
+   changed to ON
+sensor      M010
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:10:06.744954, dtype: object
+   changed to ON
+sensor      M010
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:11:30.181854, dtype: object
+   changed to OFF
+sensor      M010
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:12:35.695157, dtype: object
+   changed to ON
+sensor      M010
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:17:30.048323, dtype: object
+   changed to ON
+sensor      M012
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:20:02.605328, dtype: object
+   changed to OFF
+sensor      M014
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:20:26.844111, dtype: object
+   changed to OFF
+sensor      M017
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:20:28.499773, dtype: object
+   changed to OFF
+sensor      M019
+value       OFF5
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:20:43.354004, dtype: object
+   changed to OFF
+sensor      M019
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:21:14.256228, dtype: object
+   changed to ON
+sensor      M015
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:21:19.784911, dtype: object
+   changed to ON
+sensor      M018
+value       OFF5
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:21:39.646006, dtype: object
+   changed to OFF
+sensor      M019
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:22:41.795919, dtype: object
+   changed to ON
+sensor      M019
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:23:01.729866, dtype: object
+   changed to OFF
+sensor      M015
+value        ON5
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:25:05.217156, dtype: object
+   changed to ON
+sensor      M015
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:25:51.643832, dtype: object
+   changed to OFF
+sensor      M019
+value       OFF5
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:25:53.639593, dtype: object
+   changed to OFF
+sensor      M019
+value       OFF5
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:26:19.095755, dtype: object
+   changed to OFF
+sensor      M015
+value       OFF5
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:27:12.213413, dtype: object
+   changed to OFF
+sensor       M015
+value       OFF5c
+activity      NaN
+event         NaN
+Name: 2010-12-13 10:27:43.759119, dtype: object
+   changed to OFF
+sensor       M019
+value       OFF5c
+activity      NaN
+event         NaN
+Name: 2010-12-13 10:31:50.979641, dtype: object
+   changed to OFF
+sensor      M015
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:32:27.839670, dtype: object
+   changed to OFF
+sensor      M008
+value       ON5c
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:33:05.850207, dtype: object
+   changed to ON
+sensor       M007
+value       OFFcc
+activity      NaN
+event         NaN
+Name: 2010-12-13 10:35:03.028691, dtype: object
+   changed to OFF
+sensor       M020
+value       OFF5c
+activity      NaN
+event         NaN
+Name: 2010-12-13 10:35:07.564791, dtype: object
+   changed to OFF
+sensor      M015
+value       ON5c
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:35:20.803830, dtype: object
+   changed to ON
+sensor      M019
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:35:56.651965, dtype: object
+   changed to ON
+sensor       M016
+value       OFFc5
+activity      NaN
+event         NaN
+Name: 2010-12-13 10:36:14.294845, dtype: object
+   changed to OFF
+sensor      M018
+value        ON5
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:36:50.056907, dtype: object
+   changed to ON
+sensor      M009
+value        ON5
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:38:07.701797, dtype: object
+   changed to ON
+sensor      M009
+value       ONcc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:40:33.369211, dtype: object
+   changed to ON
+sensor      M009
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:43:24.696456, dtype: object
+   changed to OFF
+sensor      M020
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 10:48:45.755724, dtype: object
+   changed to ON
+sensor      M014
+value       ONcc
+activity     NaN
+event        NaN
+Name: 2010-12-13 11:02:48.476015, dtype: object
+   changed to ON
+sensor      M009
+value       ONcc
+activity     NaN
+event        NaN
+Name: 2010-12-13 11:19:21.249120, dtype: object
+   changed to ON
+sensor       M016
+value       ONc5c
+activity      NaN
+event         NaN
+Name: 2010-12-13 11:23:29.323544, dtype: object
+   changed to ON
+sensor      M020
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 11:24:41.777694, dtype: object
+   changed to ON
+sensor      M009
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 11:25:19.296224, dtype: object
+   changed to OFF
+sensor      M012
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 11:27:48.020301, dtype: object
+   changed to ON
+sensor      M009
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 11:35:17.067517, dtype: object
+   changed to OFF
+sensor      M009
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 11:43:19.788469, dtype: object
+   changed to ON
+sensor       M016
+value       OFFcc
+activity      NaN
+event         NaN
+Name: 2010-12-13 11:46:28.711974, dtype: object
+   changed to OFF
+sensor      M019
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 11:47:57.450323, dtype: object
+   changed to OFF
+sensor      M009
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 11:49:29.904105, dtype: object
+   changed to OFF
+sensor      M003
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 11:50:29.662658, dtype: object
+   changed to OFF
+sensor      M021
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 11:51:40.144347, dtype: object
+   changed to OFF
+sensor      M004
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 11:53:17.185974, dtype: object
+   changed to OFF
+sensor      M005
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 11:56:04.625096, dtype: object
+   changed to OFF
+sensor      M014
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 11:58:42.364308, dtype: object
+   changed to OFF
+sensor      M020
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 12:00:16.813268, dtype: object
+   changed to ON
+sensor      M009
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 12:31:06.970653, dtype: object
+   changed to ON
+sensor      M019
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 12:32:37.249687, dtype: object
+   changed to OFF
+sensor      M018
+value       OFcF
+activity     NaN
+event        NaN
+Name: 2010-12-13 12:34:07.554509, dtype: object
+   changed to OFF
+sensor      M019
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 12:35:49.374990, dtype: object
+   changed to ON
+sensor      M018
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 12:37:56.797606, dtype: object
+   changed to ON
+sensor      M017
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 12:38:43.208379, dtype: object
+   changed to ON
+sensor      M021
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 12:40:37.205068, dtype: object
+   changed to ON
+sensor      M014
+value        ON5
+activity     NaN
+event        NaN
+Name: 2010-12-13 12:44:45.332022, dtype: object
+   changed to ON
+sensor      M007
+value       OFF5
+activity     NaN
+event        NaN
+Name: 2010-12-13 12:55:28.318980, dtype: object
+   changed to OFF
+sensor      M015
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 12:59:01.798060, dtype: object
+   changed to ON
+sensor      M025
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 13:00:14.710860, dtype: object
+   changed to ON
+sensor      M026
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 13:01:19.362396, dtype: object
+   changed to ON
+sensor      M014
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 13:13:31.520828, dtype: object
+   changed to ON
+sensor       M014
+value       OFFcc
+activity      NaN
+event         NaN
+Name: 2010-12-13 13:14:47.256442, dtype: object
+   changed to OFF
+sensor      M009
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 13:31:06.002349, dtype: object
+   changed to OFF
+sensor      M017
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 13:32:16.396195, dtype: object
+   changed to ON
+sensor      M014
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 13:34:37.774654, dtype: object
+   changed to ON
+sensor      M014
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 13:36:23.741578, dtype: object
+   changed to OFF
+sensor      M018
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 13:37:38.934072, dtype: object
+   changed to OFF
+sensor      M014
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 13:44:15.589124, dtype: object
+   changed to OFF
+sensor      M031
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 13:47:55.967668, dtype: object
+   changed to ON
+sensor       M018
+value       OFFcc
+activity      NaN
+event         NaN
+Name: 2010-12-13 13:49:55.904778, dtype: object
+   changed to OFF
+sensor      M026
+value       ONc5
+activity     NaN
+event        NaN
+Name: 2010-12-13 13:53:51.588689, dtype: object
+   changed to ON
+sensor      M026
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 13:57:57.357396, dtype: object
+   changed to ON
+sensor      M021
+value       ONcc
+activity     NaN
+event        NaN
+Name: 2010-12-13 14:01:38.857773, dtype: object
+   changed to ON
+sensor       M014
+value       OFF5c
+activity      NaN
+event         NaN
+Name: 2010-12-13 14:12:03.760943, dtype: object
+   changed to OFF
+sensor      M014
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 14:17:56.755062, dtype: object
+   changed to OFF
+sensor      M018
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 14:20:52.239856, dtype: object
+   changed to OFF
+sensor      M021
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 14:22:55.291577, dtype: object
+   changed to ON
+sensor      M026
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 14:23:48.022421, dtype: object
+   changed to OFF
+sensor       M026
+value       ONc5c
+activity      NaN
+event         NaN
+Name: 2010-12-13 14:26:30.824346, dtype: object
+   changed to ON
+sensor      M007
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 14:27:31.055365, dtype: object
+   changed to OFF
+sensor      M009
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 14:29:17.731302, dtype: object
+   changed to ON
+sensor      M008
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 14:39:26.774144, dtype: object
+   changed to OFF
+sensor      M019
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 14:40:31.279321, dtype: object
+   changed to ON
+sensor       D004
+value       OPENc
+activity      NaN
+event         NaN
+Name: 2010-12-13 15:26:09.840499, dtype: object
+   changed to OPEN
+sensor      M008
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 15:30:22.922953, dtype: object
+   changed to OFF
+sensor      M007
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 15:31:31.294823, dtype: object
+   changed to ON
+sensor      M021
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 19:45:05.898034, dtype: object
+   changed to ON
+sensor      M020
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 19:49:51.546445, dtype: object
+   changed to ON
+sensor      M019
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 19:51:46.953811, dtype: object
+   changed to ON
+sensor      M020
+value       OcFF
+activity     NaN
+event        NaN
+Name: 2010-12-13 20:03:37.822489, dtype: object
+   changed to OFF
+sensor      M018
+value        ONc
+activity     NaN
+event        NaN
+Name: 2010-12-13 20:04:36.285100, dtype: object
+   changed to ON
+sensor      M013
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 20:05:34.139053, dtype: object
+   changed to OFF
+sensor         M014
+value       OFFccc5
+activity        NaN
+event           NaN
+Name: 2010-12-13 20:12:21.829390, dtype: object
+   changed to OFF
+sensor      M015
+value       ONc5
+activity     NaN
+event        NaN
+Name: 2010-12-13 20:20:42.353916, dtype: object
+   changed to ON
+sensor      M014
+value       OFFc
+activity     NaN
+event        NaN
+Name: 2010-12-13 20:23:49.471750, dtype: object
+   changed to OFF
+sensor      M014
+value        ON5
+activity     NaN
+event        NaN
+Name: 2010-12-13 20:27:15.370044, dtype: object
+   changed to ON
+sensor      M009
+value       OFF5
+activity     NaN
+event        NaN
+Name: 2010-12-15 20:45:55.825275, dtype: object
+   changed to OFF
+sensor      M014
+value       OFF5
+activity     NaN
+event        NaN
+Name: 2010-12-18 16:03:17.291096, dtype: object
+   changed to OFF
+sensor      M009
+value       OFF5
+activity     NaN
+event        NaN
+Name: 2010-12-18 19:09:04.531015, dtype: object
+   changed to OFF
+sensor      M009
+value       OFF5
+activity     NaN
+event        NaN
+Name: 2010-12-18 19:15:47.229325, dtype: object
+   changed to OFF
+sensor      M024
+value        ON5
+activity     NaN
+event        NaN
+Name: 2010-12-18 19:21:54.712833, dtype: object
+   changed to ON
+sensor      M009
+value       OFF5
+activity     NaN
+event        NaN
+Name: 2010-12-18 19:33:00.275866, dtype: object
+   changed to OFF
+sensor      M009
+value        ON5
+activity     NaN
+event        NaN
+Name: 2010-12-18 20:20:06.017584, dtype: object
+   changed to ON
+sensor      M009
+value        ON5
+activity     NaN
+event        NaN
+Name: 2010-12-18 20:22:22.756170, dtype: object
+   changed to ON
+sensor      M009
+value        ON5
+activity     NaN
+event        NaN
+Name: 2010-12-18 20:25:08.721842, dtype: object
+   changed to ON
+sensor      M022
+value        ON5
+activity     NaN
+event        NaN
+Name: 2010-12-18 20:41:30.645949, dtype: object
+   changed to ON
+sensor      M024
+value        ON5
+activity     NaN
+event        NaN
+Name: 2010-12-18 20:42:29.049407, dtype: object
+   changed to ON
+sensor      M023
+value       OFF5
+activity     NaN
+event        NaN
+Name: 2010-12-18 21:28:11.400406, dtype: object
+   changed to OFF
+sensor      M014
+value        ON5
+activity     NaN
+event        NaN
+Name: 2010-12-18 21:59:47.192831, dtype: object
+   changed to ON
+sensor      M019
+value        ON5
+activity     NaN
+event        NaN
+Name: 2010-12-18 22:14:06.310908, dtype: object
+   changed to ON
+sensor      M007
+value       OFF5
+activity     NaN
+event        NaN
+Name: 2010-12-18 22:50:05.651573, dtype: object
+   changed to OFF
+sensor       M009
+value           O
+activity    Relax
+event       begin
+Name: 2011-02-23 15:28:52.875123, dtype: object
+   changed to ON
+sensor        M026
+value       ONM026
+activity       NaN
+event          NaN
+Name: 2011-04-14 09:56:45.413465, dtype: object
+   changed to ON
+sensor        M020
+value       ONM026
+activity       NaN
+event          NaN
+Name: 2011-04-14 10:19:01.978394, dtype: object
+   changed to ON
+sensor        M010
+value       ONM009
+activity       NaN
+event          NaN
+Name: 2011-04-25 00:15:41.512656, dtype: object
+   changed to ON
+sensor        M024
+value       ONM024
+activity       NaN
+event          NaN
+Name: 2011-05-14 15:54:34.668259, dtype: object
+   changed to ON
+sensor        D004
+value       CLOSED
+activity       NaN
+event          NaN
+Name: 2011-05-19 19:10:23.573388, dtype: object
+   changed to CLOSE
