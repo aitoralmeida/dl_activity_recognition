@@ -20,3 +20,42 @@ In the file "data"
   * Special case: line 2011-05-10 18:42:45.169231 contains a 'c' as sensor name but a value 'OFF'. It seems it is a motion sensor, more concretely M014, which gets activated in the line above. I changed 'c' by 'M014'
 
 - I detected values like "OFFcc", "22.5cc" etc. Numeric values are already clean, but the others are to be cleaned yet. There are a lot of them. -> I implemented some code to detect those non-valid values, compute their similarity to valid ones (ON, OFF, OPEN, CLOSE), and substitue by the valid ones (145 rows modified; look at "weird_values.txt" to check the substituted rows)
+
+- Unique sensors: 39
+  ['M003', 'T002', 'T003', 'T004', 'T005', 'T001', 'M002', 'M007',
+       'M005', 'M004', 'M006', 'M008', 'M020', 'M010', 'M011', 'M012',
+       'M013', 'M014', 'M009', 'M018', 'M019', 'M015', 'M016', 'M017',
+       'M021', 'M022', 'M023', 'M001', 'M024', 'D002', 'M031', 'D004',
+       'M030', 'M029', 'M028', 'D001', 'M026', 'M027', 'M025']
+
+- Activity instances: 6477
+
+- Average actions per activity:
+  Bed_to_Toilet: 4.72
+  Eating: 37.12
+  Enter_Home: 4.74
+  Housekeeping: 314.57
+  Leave_Home: 4.52
+  Meal_Preparation: 184.51
+  Relax: 65.05
+  Resperate: 95.17
+  Sleeping: 79.54
+  Wash_Dishes: 168.1
+  Work: 51.57
+
+  Avg: 91.78
+
+- Average action per activity excluding temperature sensors:
+  Bed_to_Toilet: 4.23
+  Eating: 34.58
+  Enter_Home: 2.35
+  Housekeeping: 151.27
+  Leave_Home: 2.23
+  Meal_Preparation: 90.41
+  Relax: 59.38
+  Resperate: 45.17
+  Sleeping: 40.89
+  Wash_Dishes: 82.32
+  Work: 47.72
+
+  Avg: 50.91

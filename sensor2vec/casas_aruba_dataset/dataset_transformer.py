@@ -12,17 +12,20 @@ from difflib import SequenceMatcher
 # Input data
 INPUT_DATASET = "data"
 # Dataset formatted in our own format
-OUTPUT_DATASET = "aruba_dataset.csv"
+OUTPUT_COMPLETE_DATASET = "aruba_complete_dataset.csv"
 
 # Function to check the similarity between two strings
 def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
 
 
+print "Loading ", INPUT_DATASET
 # Load the input dataset in a pd.DataFrame
-idf = pd.read_csv(INPUT_DATASET, parse_dates=[[0, 1]], header=None, index_col=0, sep=' ')
-idf.columns = ['sensor', 'value', 'activity', 'event']
-idf.index.names = ["timestamp"]
+#idf = pd.read_csv(INPUT_DATASET, parse_dates=[[0, 1]], header=None, index_col=0, sep=' ')
+idf = pd.read_csv(INPUT_DATASET, parse_dates=[[0, 1]], header=None, sep=' ')
+#idf.columns = ['sensor', 'value', 'activity', 'event']
+idf.columns = ["timestamp", 'sensor', 'value', 'activity', 'event']
+#idf.index.names = ["timestamp"]
 
 #print idf.head(50)
 
@@ -73,37 +76,49 @@ auxdf = auxdf[auxdf["value"] != "OPEN"]
 print auxdf.head(10)
 
 # At this point, auxdf has only invalid sensor values
-for i in xrange(len(auxdf)):
+#for i in xrange(len(auxdf)):
+for i in auxdf.index:
     maxv = 0.0
-    candidate = auxdf.ix[i]["value"]
+    candidate = auxdf.loc[i]["value"]
     for value in valid_values:
-        sim = similar(auxdf.ix[i]["value"], value)
+        sim = similar(auxdf.loc[i]["value"], value)
         if sim > maxv:
             maxv = sim
             candidate = value
     #print auxdf.ix[i]
     #print "   changed to", candidate
-    #modify the actual row in idf
-    index = auxdf.index[i]
-    idf.loc[index]["value"] = candidate
-    #print idf.loc[index]
+    #modify the actual row in idf    
+    idf.set_value(i, "value", candidate)    
 
 # In order to verify the change, print idf
+
 index = auxdf.index
 print "Weird values modified"
 newdf = idf.loc[index]
 print newdf.head(10)
 
 
+# Fill all the activity column with corresponding values
 
-"""
-# Code to identify weird sensor names
+begin_index = idf[idf["event"] == "begin"].index
+end_index = idf[idf["event"] == "end"].index
 
-auxdf = idf[idf["sensor"].str.contains('M0')==False]
-auxdf = auxdf[auxdf["sensor"].str.contains('D0')==False]
-auxdf = auxdf[auxdf["sensor"].str.contains('T0')==False]
+assert(len(begin_index) == len(end_index))
 
-print auxdf.head(10)
-"""
+print "Number of activities:", len(begin_index)
+for i in xrange(len(begin_index)):
+    print i
+    activity = idf.loc[begin_index[i]]["activity"]
+    idf.loc[begin_index[i]:end_index[i]]["activity"] = activity
+
+# Now replace every NaN in the column "activity" by "None"
+idf["activity"].fillna("None", inplace=True)
+
+print "Activities properly set"
+print idf.head(60)
+
+# Write the DataFrame to CSV
+idf.to_csv(OUTPUT_COMPLETE_DATASET, header=False, index=False)
+
 
 
