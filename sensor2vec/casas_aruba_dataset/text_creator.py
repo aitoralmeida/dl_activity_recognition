@@ -155,6 +155,10 @@ def main(argv):
     # Load Aruba dataset
     idf = pd.read_csv(DATASET, parse_dates=[0], header=None, sep=',')
     idf.columns = ["timestamp", 'sensor', 'value', 'activity', 'event']
+    #storeContinuousCompleteNumeric(idf)
+    #storeContinuousNoT(idf)
+    #storeLinedCompleteNumeric(idf)
+    #storeLinedNoT(idf)    
     #storeContinuousCompleteRanges(idf)    
     storeLinedCompleteRanges(idf)
 
