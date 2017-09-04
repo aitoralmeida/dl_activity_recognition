@@ -29,23 +29,20 @@ from gensim.models import Word2Vec
 import numpy as np
 
 # Directory of datasets
-DIR = '../sensor2vec/kasteren_dataset/'
-# Dataset with vectors but without the action timestamps
-DATASET_CSV = DIR + 'base_kasteren_reduced.csv'
-DATASET_NO_TIME = DIR + 'dataset_no_time.json'
-# List of unique activities in the dataset
-UNIQUE_ACTIVITIES = DIR + 'unique_activities.json'
-# List of unique actions in the dataset
-UNIQUE_ACTIONS = DIR + 'unique_actions.json'
-# Action vectors
-ACTION_VECTORS = DIR + 'actions_vectors.json'
+DIR = '../sensor2vec/casas_aruba_dataset/'
+# Choose the specific dataset
+DATASET_CSV = DIR + 'aruba_complete_numeric.csv'
+
+# TODO: Action vectors -> Ask Aitor!!
+# ACTION_VECTORS = DIR + 'action2vec/actions_vectors.json'
 # Word2Vec model
-WORD2VEC_MODEL = DIR + 'actions.model'
+WORD2VEC_MODEL = DIR + 'action2vec/continuous_complete_numeric_200_10.model' # d=200, win=10
 
 # Maximun number of actions in an activity
-ACTIVITY_MAX_LENGTH = 32
+#ACTIVITY_MAX_LENGTH = 32 # Extract from the dataset itself
+
 # Number of dimensions of an action vector
-ACTION_MAX_LENGTH = 50
+ACTION_MAX_LENGTH = 200 # Make coherent with selected WORD2VEC_MODEL
 
 
 
@@ -67,41 +64,6 @@ def check_activity_distribution(y_np, unique_activities):
         index = activity_np.tolist().index(1.0)
         activities.append(unique_activities[index])
     print Counter(activities)
-    
-def prepare_variable_sequences(df, action_vectors, unique_activities, activity_to_int):
-    X = []
-    y = []    
-    
-    current_activity = ""
-    actions = []
-    aux_actions = []
-    for index in df.index:        
-        if current_activity == "":
-            current_activity = df.loc[index, 'activity']
-            
-        
-        if current_activity != df.loc[index, 'activity']:
-            y.append(activity_to_int[current_activity])
-            X.append(actions)            
-            #print current_activity, aux_actions
-            current_activity = df.loc[index, 'activity']
-            # reset auxiliary variables
-            actions = []
-            aux_actions = []
-        
-        action = df.loc[index, 'action']
-        #print 'Current action: ', action
-        actions.append(np.array(action_vectors[action]))
-        aux_actions.append(action)
-        
-    # Append the last activity
-    y.append(activity_to_int[current_activity])
-    X.append(actions)
-    
-    # Use sequence padding for training samples
-    X = pad_sequences(X, maxlen=ACTIVITY_MAX_LENGTH, dtype='float32')    
-        
-    return X, y
     
     
 """
@@ -144,7 +106,7 @@ def plot_training_info(metrics, save, history):
 """
 Function which implements the data framing to use an embedding layer
 Input:
-    df -> Pandas DataFrame with timestamp, sensor, action, event and activity
+    df -> Pandas DataFrame with timestamp, action and activity
     activity_to_int -> dict with the mappings between activities and integer indices
     delta -> integer to control the segmentation of actions for sequence generation
 Output:
@@ -156,17 +118,23 @@ Output:
 def prepare_embeddings(df, activity_to_int, delta = 0):
     # Numpy array with all the actions of the dataset
     actions = df['action'].values
+    print "prepare_embeddings: actions length:", len(actions)
     
     # Use tokenizer to generate indices for every action
     # Very important to put lower=False, since the Word2Vec model
     # has the action names with some capital letters
-    tokenizer = Tokenizer(lower=False)
+    # Very important to remove '.' and '_' from filters, since they are used
+    # in action names (T003_21.5)
+    tokenizer = Tokenizer(lower=False, filters='!"#$%&()*+,-/:;<=>?@[\\]^`{|}~\t\n')
     tokenizer.fit_on_texts(actions)
     action_index = tokenizer.word_index
+    print "prepare_embeddings: action_index:"
+    print action_index.keys()
     
     # Build new list with action indices    
     trans_actions = np.zeros(len(actions))
-    for i in xrange(len(actions)):        
+    for i in xrange(len(actions)):
+        #print "prepare_embeddings: action:", actions[i]        
         trans_actions[i] = action_index[actions[i]]
 
     #print trans_actions
@@ -174,10 +142,13 @@ def prepare_embeddings(df, activity_to_int, delta = 0):
     y = []
     # Depending on delta, we generate sequences in different ways
     if delta == 0:
+        # Each sequence is composed by the actions of that
+        # activity instance
         current_activity = ""
         actionsdf = []
         aux_actions = []
         i = 0
+        ACTIVITY_MAX_LENGTH = 0
         for index in df.index:        
             if current_activity == "":
                 current_activity = df.loc[index, 'activity']
@@ -200,6 +171,8 @@ def prepare_embeddings(df, activity_to_int, delta = 0):
         # Append the last activity
         y.append(activity_to_int[current_activity])
         X.append(actionsdf)
+        if len(actionsdf) > ACTIVITY_MAX_LENGTH:
+            ACTIVITY_MAX_LENGTH = len(actionsdf)
     else:
         # TODO: use delta value as the time slice for action segmentation
         # as Kasteren et al.
@@ -210,17 +183,22 @@ def prepare_embeddings(df, activity_to_int, delta = 0):
         i = 0
         DYNAMIC_MAX_LENGTH = 0
         while current_index < last_index:
+            current_time = df.loc[current_index, 'timestamp']
             print 'prepare_embeddings: inside while', i
-            print 'prepare_embeddings: current index', current_index
+            print 'prepare_embeddings: current time', current_time
             i = i + 1
             actionsdf = []
             
-            auxdf = df.iloc[np.logical_and(df.index >= current_index, df.index < current_index + pd.DateOffset(seconds=delta))]
-            print 'auxdf'
-            print auxdf
+            #auxdf = df.iloc[np.logical_and(df.index >= current_index, df.index < current_index + pd.DateOffset(seconds=delta))]
+            auxdf = df.loc[np.logical_and(df.timestamp >= current_time, df.timestamp < current_time + pd.DateOffset(seconds=delta))]
+            
+            #print 'auxdf'
+            #print auxdf
                         
-            first = df.index.get_loc(auxdf.index[0])
-            last = df.index.get_loc(auxdf.index[len(auxdf)-1])
+            #first = df.index.get_loc(auxdf.index[0])
+            first = auxdf.index[0]
+            #last = df.index.get_loc(auxdf.index[len(auxdf)-1])
+            last = auxdf.index[len(auxdf)-1]
             print 'First:', first, 'Last:', last
             if first == last:
                 actionsdf.append(np.array(trans_actions[first]))
@@ -237,8 +215,12 @@ def prepare_embeddings(df, activity_to_int, delta = 0):
             y.append(activity_to_int[activity])
             
             # Update current_index            
-            pos = df.index.get_loc(auxdf.index[len(auxdf)-1])
-            current_index = df.index[pos+1]
+            #pos = df.index.get_loc(auxdf.index[len(auxdf)-1])
+            #current_index = df.index[pos+1]
+            if last < last_index:
+                current_index = last + 1
+            else:
+                current_index = last_index
             
             
         print "To be tested!"
@@ -281,31 +263,29 @@ def create_embedding_matrix(tokenizer):
 def main(argv):
     
     # Load dataset from csv file
-    df_dataset = pd.read_csv(DATASET_CSV, parse_dates=[[0, 1]], header=None, index_col=0, sep=' ')
-    df_dataset.columns = ['sensor', 'action', 'event', 'activity']
-    df_dataset.index.names = ["timestamp"]
-    unique_activities = json.load(open(UNIQUE_ACTIVITIES, 'r'))
+    df_dataset = pd.read_csv(DATASET_CSV, parse_dates=[0], header=None)
+    df_dataset.columns = ["timestamp", 'action', 'activity']    
+    
+    df = df_dataset[0:1000] # reduce dataset for tests
+    unique_activities = df['activity'].unique()
+    print "Unique activities:"
+    print unique_activities
+
     total_activities = len(unique_activities)
-    action_vectors = json.load(open(ACTION_VECTORS, 'r'))
+    #action_vectors = json.load(open(ACTION_VECTORS, 'r'))
     
     # Generate the dict to transform activities to integer numbers
     activity_to_int = dict((c, i) for i, c in enumerate(unique_activities))
     # Generate the dict to transform integer numbers to activities
     int_to_activity = dict((i, c) for i, c in enumerate(unique_activities))
 
-    # Prepare padded variable sequences for activities
-    # Each action is represented as a vector of size 50
-    # This data framing approach assumes a perfect segmentation of actions for activities
-    # and non-trainable action embeddings
-    #X, y = prepare_variable_sequences(df_dataset, action_vectors, unique_activities, activity_to_int)
-    
-    
+        
     # Prepare sequences using action indices
     # Each action will be an index which will point to an action vector
     # in the weights matrix of the Embedding layer of the network input
     # Use 'delta' to establish slicing time; if 0, slicing done on activity type basis
     delta = 60 # To test the same time slicing as Kasteren
-    X, y, tokenizer, max_sequence_length = prepare_embeddings(df_dataset, activity_to_int, delta=delta)
+    X, y, tokenizer, max_sequence_length = prepare_embeddings(df, activity_to_int, delta=delta)
     """
     for i in range(10):
         print '-----------------------'
