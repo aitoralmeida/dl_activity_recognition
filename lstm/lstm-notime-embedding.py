@@ -266,7 +266,8 @@ def main(argv):
     df_dataset = pd.read_csv(DATASET_CSV, parse_dates=[0], header=None)
     df_dataset.columns = ["timestamp", 'action', 'activity']    
     
-    df = df_dataset[0:1000] # reduce dataset for tests
+    #df = df_dataset[0:1000] # reduce dataset for tests
+    df = df_dataset
     unique_activities = df['activity'].unique()
     print "Unique activities:"
     print unique_activities
