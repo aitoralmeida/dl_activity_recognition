@@ -266,7 +266,7 @@ def main(argv):
     df_dataset = pd.read_csv(DATASET_CSV, parse_dates=[0], header=None)
     df_dataset.columns = ["timestamp", 'action', 'activity']    
     
-    #df = df_dataset[0:1000] # reduce dataset for tests
+    #df = df_dataset[0:200000] # reduce dataset for tests
     df = df_dataset
     unique_activities = df['activity'].unique()
     print "Unique activities:"
@@ -285,7 +285,7 @@ def main(argv):
     # Each action will be an index which will point to an action vector
     # in the weights matrix of the Embedding layer of the network input
     # Use 'delta' to establish slicing time; if 0, slicing done on activity type basis
-    delta = 60 # To test the same time slicing as Kasteren
+    delta = 180 # To test the same time slicing as Kasteren (60)
     X, y, tokenizer, max_sequence_length = prepare_embeddings(df, activity_to_int, delta=delta)
     """
     for i in range(10):
@@ -368,7 +368,7 @@ def main(argv):
     sys.stdout.flush()
     # Automatic training for Stateless LSTM
     manual_training = False
-    history = model.fit(X, y, batch_size=batch_size, nb_epoch=1000, validation_data=(X_test, y_test), shuffle=False)
+    history = model.fit(X, y, batch_size=batch_size, nb_epoch=100, validation_data=(X_test, y_test), shuffle=False)
     
     print 'Saving model...'
     sys.stdout.flush()
