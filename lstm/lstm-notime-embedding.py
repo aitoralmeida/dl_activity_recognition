@@ -213,8 +213,9 @@ def prepare_embeddings(df, activity_to_int, delta = 0):
                 for i in xrange(first, last):            
                     actionsdf.append(np.array(trans_actions[i]))
             
-            if len(actionsdf) > DYNAMIC_MAX_LENGTH:
+            if len(actionsdf) > DYNAMIC_MAX_LENGTH:                
                 DYNAMIC_MAX_LENGTH = len(actionsdf)
+                print "MAX LENGTH =", DYNAMIC_MAX_LENGTH, df.loc[current_index, 'timestamp']
                 
             X.append(actionsdf)
             # Find the dominant activity in the time slice of auxdf
@@ -271,8 +272,8 @@ def main(argv):
     df_dataset = pd.read_csv(DATASET_CSV, parse_dates=[0], header=None)
     df_dataset.columns = ["timestamp", 'action', 'activity']    
     
-    df = df_dataset[0:10000] # reduce dataset for tests
-    #df = df_dataset # complete dataset
+    #df = df_dataset[0:10000] # reduce dataset for tests
+    df = df_dataset # complete dataset
     unique_activities = df['activity'].unique()
     print "Unique activities:"
     print unique_activities
@@ -290,7 +291,7 @@ def main(argv):
     # Each action will be an index which will point to an action vector
     # in the weights matrix of the Embedding layer of the network input
     # Use 'delta' to establish slicing time; if 0, slicing done on activity type basis
-    delta = 180 # To test the same time slicing as Kasteren (60)
+    delta = 60 # To test the same time slicing as Kasteren (60)
     X, y, tokenizer, max_sequence_length = prepare_embeddings(df, activity_to_int, delta=delta)
     """
     for i in range(10):
@@ -321,6 +322,7 @@ def main(argv):
     X_test = X[:limit]
     y_train = y[limit:]
     y_test = y[:limit]
+    print 'Max sequence length:', max_sequence_length
     print 'Total examples:', total_examples
     print 'Train examples:', len(X_train), len(y_train) 
     print 'Test examples:', len(X_test), len(y_test)
