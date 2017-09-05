@@ -31,18 +31,21 @@ import numpy as np
 # Directory of datasets
 DIR = '../sensor2vec/casas_aruba_dataset/'
 # Choose the specific dataset
-DATASET_CSV = DIR + 'aruba_complete_numeric.csv'
+#DATASET_CSV = DIR + 'aruba_complete_numeric.csv'
+DATASET_CSV = DIR + 'aruba_no_t.csv'
 
 # TODO: Action vectors -> Ask Aitor!!
 # ACTION_VECTORS = DIR + 'action2vec/actions_vectors.json'
 # Word2Vec model
-WORD2VEC_MODEL = DIR + 'action2vec/continuous_complete_numeric_200_10.model' # d=200, win=10
+#WORD2VEC_MODEL = DIR + 'action2vec/continuous_complete_numeric_200_10.model' # d=200, win=10
+WORD2VEC_MODEL = DIR + 'action2vec/continuous_no_t_50_10.model' # d=50, win=10
 
 # Maximun number of actions in an activity
 #ACTIVITY_MAX_LENGTH = 32 # Extract from the dataset itself
 
 # Number of dimensions of an action vector
-ACTION_MAX_LENGTH = 200 # Make coherent with selected WORD2VEC_MODEL
+#ACTION_MAX_LENGTH = 200 # Make coherent with selected WORD2VEC_MODEL
+ACTION_MAX_LENGTH = 50 # Make coherent with selected WORD2VEC_MODEL
 
 
 
@@ -184,9 +187,13 @@ def prepare_embeddings(df, activity_to_int, delta = 0):
         DYNAMIC_MAX_LENGTH = 0
         while current_index < last_index:
             current_time = df.loc[current_index, 'timestamp']
-            print 'prepare_embeddings: inside while', i
-            print 'prepare_embeddings: current time', current_time
-            i = i + 1
+            #print 'prepare_embeddings: inside while', i
+            #print 'prepare_embeddings: current time', current_time
+            i = i + 1            
+            
+            if i % 10 == 0:
+                print '.',
+            
             actionsdf = []
             
             #auxdf = df.iloc[np.logical_and(df.index >= current_index, df.index < current_index + pd.DateOffset(seconds=delta))]
@@ -199,7 +206,7 @@ def prepare_embeddings(df, activity_to_int, delta = 0):
             first = auxdf.index[0]
             #last = df.index.get_loc(auxdf.index[len(auxdf)-1])
             last = auxdf.index[len(auxdf)-1]
-            print 'First:', first, 'Last:', last
+            #print 'First:', first, 'Last:', last
             if first == last:
                 actionsdf.append(np.array(trans_actions[first]))
             else:
@@ -222,9 +229,7 @@ def prepare_embeddings(df, activity_to_int, delta = 0):
             else:
                 current_index = last_index
             
-            
-        print "To be tested!"
-    
+                
 
     # Pad sequences
     max_sequence_length = 0
@@ -266,8 +271,8 @@ def main(argv):
     df_dataset = pd.read_csv(DATASET_CSV, parse_dates=[0], header=None)
     df_dataset.columns = ["timestamp", 'action', 'activity']    
     
-    #df = df_dataset[0:200000] # reduce dataset for tests
-    df = df_dataset
+    df = df_dataset[0:10000] # reduce dataset for tests
+    #df = df_dataset # complete dataset
     unique_activities = df['activity'].unique()
     print "Unique activities:"
     print unique_activities
