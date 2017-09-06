@@ -33,6 +33,7 @@ DIR = '../sensor2vec/casas_aruba_dataset/'
 # Choose the specific dataset
 #DATASET_CSV = DIR + 'aruba_complete_numeric.csv'
 DATASET_CSV = DIR + 'aruba_no_t.csv'
+#DATASET_CSV = DIR + 'aruba_no_t_testsplit.csv'
 
 # TODO: Action vectors -> Ask Aitor!!
 # ACTION_VECTORS = DIR + 'action2vec/actions_vectors.json'
@@ -191,9 +192,10 @@ def prepare_embeddings(df, activity_to_int, delta = 0):
             #print 'prepare_embeddings: current time', current_time
             i = i + 1            
             
+            """
             if i % 10 == 0:
                 print '.',
-            
+            """
             actionsdf = []
             
             #auxdf = df.iloc[np.logical_and(df.index >= current_index, df.index < current_index + pd.DateOffset(seconds=delta))]
@@ -207,15 +209,24 @@ def prepare_embeddings(df, activity_to_int, delta = 0):
             #last = df.index.get_loc(auxdf.index[len(auxdf)-1])
             last = auxdf.index[len(auxdf)-1]
             #print 'First:', first, 'Last:', last
+            #actionsdf.append(np.array(trans_actions[first:last]))
+            
             if first == last:
                 actionsdf.append(np.array(trans_actions[first]))
             else:
-                for i in xrange(first, last):            
-                    actionsdf.append(np.array(trans_actions[i]))
+                for j in xrange(first, last+1):            
+                    actionsdf.append(np.array(trans_actions[j]))
             
-            if len(actionsdf) > DYNAMIC_MAX_LENGTH:                
+            if len(actionsdf) > DYNAMIC_MAX_LENGTH:
+                print " "
                 DYNAMIC_MAX_LENGTH = len(actionsdf)
-                print "MAX LENGTH =", DYNAMIC_MAX_LENGTH, df.loc[current_index, 'timestamp']
+                print "MAX LENGTH =", DYNAMIC_MAX_LENGTH
+                print 'First:', auxdf.loc[first, 'timestamp'], 'Last:', auxdf.loc[last, 'timestamp']
+                print 'first index:', first, 'last index:', last
+                print 'Length:', len(auxdf)
+                #print auxdf
+                #print actionsdf
+                
                 
             X.append(actionsdf)
             # Find the dominant activity in the time slice of auxdf
@@ -272,7 +283,7 @@ def main(argv):
     df_dataset = pd.read_csv(DATASET_CSV, parse_dates=[0], header=None)
     df_dataset.columns = ["timestamp", 'action', 'activity']    
     
-    #df = df_dataset[0:10000] # reduce dataset for tests
+    #df = df_dataset[0:1000] # reduce dataset for tests
     df = df_dataset # complete dataset
     unique_activities = df['activity'].unique()
     print "Unique activities:"
@@ -349,7 +360,7 @@ def main(argv):
     sys.stdout.flush()   
 
     # Build the model
-       
+    sys.exit() # to test the data framing phase   
     print 'Building model...'
     sys.stdout.flush()
     batch_size = 16
