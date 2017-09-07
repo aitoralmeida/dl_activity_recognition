@@ -359,8 +359,7 @@ def main(argv):
     print 'Training set prepared'  
     sys.stdout.flush()   
 
-    # Build the model
-    sys.exit() # to test the data framing phase   
+    # Build the model    
     print 'Building model...'
     sys.stdout.flush()
     batch_size = 16
