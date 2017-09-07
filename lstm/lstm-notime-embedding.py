@@ -18,6 +18,7 @@ import pandas as pd
 
 from keras.models import Sequential
 from keras.models import model_from_json
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Dense, Activation, Embedding, Input, Dropout
 from keras.layers import LSTM
 from keras.utils import np_utils
@@ -283,8 +284,8 @@ def main(argv):
     df_dataset = pd.read_csv(DATASET_CSV, parse_dates=[0], header=None)
     df_dataset.columns = ["timestamp", 'action', 'activity']    
     
-    #df = df_dataset[0:1000] # reduce dataset for tests
-    df = df_dataset # complete dataset
+    df = df_dataset[0:1000] # reduce dataset for tests
+    #df = df_dataset # complete dataset
     unique_activities = df['activity'].unique()
     print "Unique activities:"
     print unique_activities
@@ -322,26 +323,35 @@ def main(argv):
     
     
     # Prepare training and testing datasets
+    # TODO: insert code to split data into train, validation and test
     total_examples = len(X)
-    test_per = 0.2
-    limit = int(test_per * total_examples)
-    #======================================================
-    # Be careful here! Training set is built from limit
-    # Take into account for visualizations!
-    #======================================================
-    X_train = X[limit:]
-    X_test = X[:limit]
-    y_train = y[limit:]
-    y_test = y[:limit]
+    train_per = 0.6
+    val_per = 0.2
+    # test_per = 0.2 # Not needed
+    
+    train_limit = int(train_per * total_examples)
+    val_limit = train_limit + int(val_per * total_examples)    
+    X_train = X[0:train_limit]
+    X_val = X[train_limit:val_limit]
+    X_test = X[val_limit:]
+    y_train = y[0:train_limit]
+    y_val = y[train_limit:val_limit]
+    y_test = y[val_limit:]
     print 'Max sequence length:', max_sequence_length
     print 'Total examples:', total_examples
     print 'Train examples:', len(X_train), len(y_train) 
+    print 'Validation examples:', len(X_val), len(y_val)
     print 'Test examples:', len(X_test), len(y_test)
     sys.stdout.flush()  
-    X = np.array(X_train)
-    y = np.array(y_train)
+    X_train = np.array(X_train)
+    y_train = np.array(y_train)
     print 'Activity distribution for training:'
-    check_activity_distribution(y, unique_activities)
+    check_activity_distribution(y_train, unique_activities)
+
+    X_val = np.array(X_val)
+    y_val = np.array(y_val)
+    print 'Activity distribution for validation:'
+    check_activity_distribution(y_val, unique_activities)
     
     X_test = np.array(X_test)
     y_test = np.array(y_test)    
@@ -354,8 +364,8 @@ def main(argv):
     #X_test = X_test.reshape(X_test.shape[0], ACTIVITY_MAX_LENGTH, ACTION_MAX_LENGTH)
     # If we are using an Embedding layer, there is no need to reshape
     print 'Shape (X,y):'
-    print X.shape
-    print y.shape
+    print X_train.shape
+    print y_train.shape
     print 'Training set prepared'  
     sys.stdout.flush()   
 
@@ -383,14 +393,22 @@ def main(argv):
 
     print 'Training...'    
     sys.stdout.flush()
-    # Automatic training for Stateless LSTM
-    manual_training = False
-    history = model.fit(X, y, batch_size=batch_size, nb_epoch=100, validation_data=(X_test, y_test), shuffle=False)
+    # Define the callbacks to be used (EarlyStopping and ModelCheckpoint)
+    earlystopping = EarlyStopping(monitor='val_loss', patience=2, verbose=0)
+    modelcheckpoint = ModelCheckpoint('lstm-notime-embedding.model', monitor='val_loss', save_best_only=True, verbose=0)
+    callbacks = [earlystopping, modelcheckpoint]
     
-    print 'Saving model...'
-    sys.stdout.flush()
-    save_model(model)
-    print 'Model saved'
+    # Automatic training for Stateless LSTM
+    manual_training = False    
+    history = model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=100, validation_data=(X_val, y_val), shuffle=False, callbacks=callbacks)
+    
+    # TODO: check how ModelCheckpoint saves the model
+    # TODO: use the test set to calculate precision, recall and F-Measure
+    
+    #print 'Saving model...'
+    #sys.stdout.flush()
+    #save_model(model)
+    #print 'Model saved'
     if manual_training == True:
         plot_training_info(['accuracy', 'loss'], True, history)
     else:
