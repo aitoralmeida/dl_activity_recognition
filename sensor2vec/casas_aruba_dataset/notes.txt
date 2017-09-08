@@ -59,3 +59,9 @@ In the file "data"
   Work: 47.72
 
   Avg: 50.91
+
+
+- VERY IMPORTANT!!
+  Once started with the tests, I discovered that the whole day 2011-05-23 seems to be repeated in the dataset!
+  In aruba_no_t_testsplit.csv, a partial dataset built removing temperature sensors and focusing only on a specific slice, the repeated day begins at line 9493, while the original day begins at 3181. Next day (2011-05-24) begins at line 15805, so it is quite clear that there is a complete duplicate of the 2011-05-23 day. (corrected manually)
+  In aruba_no_t.csv: original day: 1453180, duplicated day: 1459492, next day: 1465804 (corrected manually)
