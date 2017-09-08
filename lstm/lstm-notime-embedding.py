@@ -29,6 +29,9 @@ from gensim.models import Word2Vec
 
 import numpy as np
 
+from sklearn import metrics
+from sklearn.metrics import confusion_matrix
+
 # Directory of datasets
 DIR = '../sensor2vec/casas_aruba_dataset/'
 # Choose the specific dataset
@@ -276,6 +279,50 @@ def create_embedding_matrix(tokenizer):
     print unknown_words
     
     return embedding_matrix
+    
+    
+def calculate_evaluation_metrics(y_gt, y_preds):
+    
+    """Calculates the evaluation metrics (precision, recall and F1) for the
+    predicted examples. It calculates the micro, macro and weighted values
+    of each metric.
+            
+    Usage example:
+        y_gt = ['make_coffe', 'brush_teeth', 'wash_hands']
+        y_preds = ['make_coffe', 'wash_hands', 'wash_hands']
+        metrics = calculate_evaluation_metrics (y_ground_truth, y_predicted)
+        
+    Parameters
+    ----------
+        y_gt : array, shape = [n_samples]
+            Classes that appear in the ground truth.
+        
+        y_preds: array, shape = [n_samples]
+            Predicted classes. Take into account that the must follow the same
+            order as in y_ground_truth
+           
+    Returns
+    -------
+        metric_results : dict
+            Dictionary with the values for the metrics (precision, recall and 
+            f1)    
+    """
+        
+    metric_types =  ['micro', 'macro', 'weighted']
+    metric_results = {
+        'precision' : {},
+        'recall' : {},
+        'f1' : {},
+        'acc' : -1.0        
+    }
+            
+    for t in metric_types:
+        metric_results['precision'][t] = metrics.precision_score(y_gt, y_preds, average = t)
+        metric_results['recall'][t] = metrics.recall_score(y_gt, y_preds, average = t)
+        metric_results['f1'][t] = metrics.f1_score(y_gt, y_preds, average = t)
+        metric_results['acc'] = metrics.accuracy_score(y_gt, y_preds) 
+                
+    return metric_results
 
 # Main function
 def main(argv):
@@ -284,8 +331,8 @@ def main(argv):
     df_dataset = pd.read_csv(DATASET_CSV, parse_dates=[0], header=None)
     df_dataset.columns = ["timestamp", 'action', 'activity']    
     
-    df = df_dataset[0:1000] # reduce dataset for tests
-    #df = df_dataset # complete dataset
+    #df = df_dataset[0:1000] # reduce dataset for tests
+    df = df_dataset # complete dataset
     unique_activities = df['activity'].unique()
     print "Unique activities:"
     print unique_activities
@@ -323,7 +370,7 @@ def main(argv):
     
     
     # Prepare training and testing datasets
-    # TODO: insert code to split data into train, validation and test
+    # Insert code to split data into train, validation and test
     total_examples = len(X)
     train_per = 0.6
     val_per = 0.2
@@ -394,26 +441,62 @@ def main(argv):
     print 'Training...'    
     sys.stdout.flush()
     # Define the callbacks to be used (EarlyStopping and ModelCheckpoint)
-    earlystopping = EarlyStopping(monitor='val_loss', patience=2, verbose=0)
-    modelcheckpoint = ModelCheckpoint('lstm-notime-embedding.model', monitor='val_loss', save_best_only=True, verbose=0)
+    earlystopping = EarlyStopping(monitor='val_loss', patience=2, verbose=0)    
+    weights = 'lstm-notime-embedding-weights.hdf5' # TODO: improve file naming for multiple architectures
+    modelcheckpoint = ModelCheckpoint(weights, monitor='val_loss', save_best_only=True, verbose=0)
     callbacks = [earlystopping, modelcheckpoint]
     
     # Automatic training for Stateless LSTM
     manual_training = False    
     history = model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=100, validation_data=(X_val, y_val), shuffle=False, callbacks=callbacks)
+        
+    # Use the test set to calculate precision, recall and F-Measure with the bet model
+    model.load_weights(weights)
+    yp = model.predict(X_test, batch_size=1, verbose=1)
+    print "Predictions on test set:"
+    print "yp shape:", yp.shape
+    print yp
+    ypreds = np.argmax(yp, axis=1)
+    print "After using argmax:"
+    print ypreds
+    print "y_test shape:", y_test.shape
+    print y_test
+    print "y_test activity indices:"
+    ytrue = np.array(y_orig[val_limit:])
+    print ytrue
     
-    # TODO: check how ModelCheckpoint saves the model
-    # TODO: use the test set to calculate precision, recall and F-Measure
+    # Use scikit-learn metrics to calculate confusion matrix, accuracy, precision, recall and F-Measure
+    # TODO: test with the whole dataset
+    cm = confusion_matrix(ytrue, ypreds)
+    
+    # Normalize the confusion matrix by row (i.e by the number of samples
+    # in each class)
+    cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+    np.set_printoptions(precision=3, linewidth=1000)
+    print('Confusion matrix')
+    print(cm)
+    
+    print('Normalized confusion matrix')
+    print(cm_normalized)
+    
+    #Dictionary with the values for the metrics (precision, recall and f1)    
+    metrics = calculate_evaluation_metrics(ytrue, ypreds)
+    print "Scikit metrics"
+    print 'accuracy: ', metrics['acc']
+    print 'precision:', metrics['precision']
+    print 'recall:', metrics['recall']
+    print 'f1:', metrics['f1']    
     
     #print 'Saving model...'
     #sys.stdout.flush()
     #save_model(model)
     #print 'Model saved'
+    
     if manual_training == True:
         plot_training_info(['accuracy', 'loss'], True, history)
     else:
         plot_training_info(['accuracy', 'loss'], True, history.history)
-
+    
 
 if __name__ == "__main__":
    main(sys.argv)
