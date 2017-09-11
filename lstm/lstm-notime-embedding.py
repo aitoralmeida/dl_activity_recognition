@@ -419,14 +419,14 @@ def main(argv):
     print 'Loading data'
     INPUT_DIR = 'formatted_data/'
     OUTPUT_ROOT_NAME = INPUT_DIR + 'aruba_continuous_no_t_50_10'
-    embedding_matrix = np.load(OUTPUT_ROOT_NAME + '_embedding_weights.npy')
-    X_train = np.load(OUTPUT_ROOT_NAME + '_x_train.npy')
-    X_val = np.load(OUTPUT_ROOT_NAME + '_x_val.npy')
-    X_test = np.load(OUTPUT_ROOT_NAME + '_x_test.npy')
+    embedding_matrix = np.load(OUTPUT_ROOT_NAME + '_60_embedding_weights.npy')
+    X_train = np.load(OUTPUT_ROOT_NAME + '_60_x_train.npy')
+    X_val = np.load(OUTPUT_ROOT_NAME + '_60_x_val.npy')
+    X_test = np.load(OUTPUT_ROOT_NAME + '_60_x_test.npy')
     
-    y_train = np.load(OUTPUT_ROOT_NAME + '_y_train.npy')
-    y_val = np.load(OUTPUT_ROOT_NAME + '_y_val.npy')
-    y_test = np.load(OUTPUT_ROOT_NAME + '_y_test.npy')
+    y_train = np.load(OUTPUT_ROOT_NAME + '_60_y_train.npy')
+    y_val = np.load(OUTPUT_ROOT_NAME + '_60_y_val.npy')
+    y_test = np.load(OUTPUT_ROOT_NAME + '_60_y_test.npy')
     
     max_sequence_length = X_train.shape[1]
     total_activities = y_train.shape[1]
