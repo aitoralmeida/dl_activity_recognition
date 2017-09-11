@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Oct 25 16:16:52 2016
+Created on Mon Sep 11 14:38:48 2017
 
 @author: gazkune
 """
@@ -16,11 +16,7 @@ import matplotlib.pyplot as plt
 
 import pandas as pd
 
-from keras.models import Sequential
-from keras.models import model_from_json
-from keras.callbacks import EarlyStopping, ModelCheckpoint
-from keras.layers import Dense, Activation, Embedding, Input, Dropout
-from keras.layers import LSTM
+
 from keras.utils import np_utils
 from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
@@ -29,8 +25,6 @@ from gensim.models import Word2Vec
 
 import numpy as np
 
-from sklearn import metrics
-from sklearn.metrics import confusion_matrix
 
 # Directory of datasets
 DIR = '../sensor2vec/casas_aruba_dataset/'
@@ -50,66 +44,10 @@ WORD2VEC_MODEL = DIR + 'action2vec/continuous_no_t_50_10.model' # d=50, win=10
 
 # Number of dimensions of an action vector
 #ACTION_MAX_LENGTH = 200 # Make coherent with selected WORD2VEC_MODEL
-#ACTION_MAX_LENGTH = 50 # Make coherent with selected WORD2VEC_MODEL
+ACTION_MAX_LENGTH = 50 # Make coherent with selected WORD2VEC_MODEL
 
+OUTPUT_ROOT_NAME = 'formatted_data/aruba_continuous_no_t_50_10' # make coherent with WORD2VEC_MODEL
 
-
-
-
-def save_model(model):
-    json_string = model.to_json()
-    model_name = 'model_activity_lstm'
-    open(model_name + '.json', 'w').write(json_string)
-    model.save_weights(model_name + '.h5', overwrite=True)
-    
-def load_model(model_file, weights_file):
-    model = model_from_json(open(model_file).read())
-    model.load_weights(weights_file)
-    
-def check_activity_distribution(y_np, unique_activities):
-    activities = []
-    for activity_np in y_np:
-        index = activity_np.tolist().index(1.0)
-        activities.append(unique_activities[index])
-    print Counter(activities)
-    
-    
-"""
-Function to plot accurary and loss during training
-"""
-
-def plot_training_info(metrics, save, history):
-    # summarize history for accuracy
-    if 'accuracy' in metrics:
-        
-        plt.plot(history['acc'])
-        plt.plot(history['val_acc'])
-        plt.title('model accuracy')
-        plt.ylabel('accuracy')
-        plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
-        if save == True:
-            plt.savefig('accuracy.png')
-            plt.gcf().clear()
-        else:
-            plt.show()
-
-    # summarize history for loss
-    if 'loss' in metrics:
-        plt.plot(history['loss'])
-        plt.plot(history['val_loss'])
-        plt.title('model loss')
-        plt.ylabel('loss')
-        plt.xlabel('epoch')
-        #plt.ylim(1e-3, 1e-2)
-        plt.yscale("log")
-        plt.legend(['train', 'test'], loc='upper left')
-        if save == True:
-            plt.savefig('loss.png')
-            plt.gcf().clear()
-        else:
-            plt.show()
-        
 
 """
 Function which implements the data framing to use an embedding layer
@@ -279,61 +217,25 @@ def create_embedding_matrix(tokenizer):
     print unknown_words
     
     return embedding_matrix
-    
-    
-def calculate_evaluation_metrics(y_gt, y_preds):
-    
-    """Calculates the evaluation metrics (precision, recall and F1) for the
-    predicted examples. It calculates the micro, macro and weighted values
-    of each metric.
-            
-    Usage example:
-        y_gt = ['make_coffe', 'brush_teeth', 'wash_hands']
-        y_preds = ['make_coffe', 'wash_hands', 'wash_hands']
-        metrics = calculate_evaluation_metrics (y_ground_truth, y_predicted)
-        
-    Parameters
-    ----------
-        y_gt : array, shape = [n_samples]
-            Classes that appear in the ground truth.
-        
-        y_preds: array, shape = [n_samples]
-            Predicted classes. Take into account that the must follow the same
-            order as in y_ground_truth
-           
-    Returns
-    -------
-        metric_results : dict
-            Dictionary with the values for the metrics (precision, recall and 
-            f1)    
-    """
-        
-    metric_types =  ['micro', 'macro', 'weighted']
-    metric_results = {
-        'precision' : {},
-        'recall' : {},
-        'f1' : {},
-        'acc' : -1.0        
-    }
-            
-    for t in metric_types:
-        metric_results['precision'][t] = metrics.precision_score(y_gt, y_preds, average = t)
-        metric_results['recall'][t] = metrics.recall_score(y_gt, y_preds, average = t)
-        metric_results['f1'][t] = metrics.f1_score(y_gt, y_preds, average = t)
-        metric_results['acc'] = metrics.accuracy_score(y_gt, y_preds) 
-                
-    return metric_results
+
+
+# Function to check the distribution of activities in a given set
+def check_activity_distribution(y_np, unique_activities):
+    activities = []
+    for activity_np in y_np:
+        index = activity_np.tolist().index(1.0)
+        activities.append(unique_activities[index])
+    print Counter(activities)
+
 
 # Main function
 def main(argv):
     
-    """
     # Load dataset from csv file
-    df_dataset = pd.read_csv(DATASET_CSV, parse_dates=[0], header=None)
-    df_dataset.columns = ["timestamp", 'action', 'activity']    
+    df = pd.read_csv(DATASET_CSV, parse_dates=[0], header=None)
+    df.columns = ["timestamp", 'action', 'activity']    
     
-    #df = df_dataset[0:1000] # reduce dataset for tests
-    df = df_dataset # complete dataset
+    #df = df[0:1000] # reduce dataset for tests    
     unique_activities = df['activity'].unique()
     print "Unique activities:"
     print unique_activities
@@ -355,18 +257,28 @@ def main(argv):
     X, y, tokenizer, max_sequence_length = prepare_embeddings(df, activity_to_int, delta=delta)
     
     # Create the embedding matrix for the embedding layer initialization
-    embedding_matrix = create_embedding_matrix(tokenizer)
-    #print "Embedding matrix"
-    #print embedding_matrix
+    embedding_matrix = create_embedding_matrix(tokenizer)    
+    
+    print 'max sequence length:', max_sequence_length
+    print 'X shape:', X.shape
+    
+    print 'embedding matrix shape:', embedding_matrix.shape
+    
+    
     
     # Keep original y (with activity indices) before transforming it to categorical
     y_orig = deepcopy(y)
     # Tranform class labels to one-hot encoding
     y = np_utils.to_categorical(y)
+    print 'y shape:', y.shape
+    
+    # Save X, y and embedding_matrix using numpy serialization
+    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_x.npy', X)
+    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_y.npy', y)
+    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_embedding_weights.npy', embedding_matrix)
     
     
-    # Prepare training and testing datasets
-    # Insert code to split data into train, validation and test
+    # Prepare training, validation and testing datasets    
     total_examples = len(X)
     train_per = 0.6
     val_per = 0.2
@@ -387,7 +299,7 @@ def main(argv):
     print 'Test examples:', len(X_test), len(y_test)
     sys.stdout.flush()  
     X_train = np.array(X_train)
-    y_train = np.array(y_train)
+    y_train = np.array(y_train)    
     print 'Activity distribution for training:'
     check_activity_distribution(y_train, unique_activities)
 
@@ -402,117 +314,18 @@ def main(argv):
     print 'Activity distribution for testing:'
     check_activity_distribution(y_test, unique_activities)
 
-    # Reshape for using with static action vectors
-    #X = X.reshape(X.shape[0], ACTIVITY_MAX_LENGTH, ACTION_MAX_LENGTH)
-    #X_test = X_test.reshape(X_test.shape[0], ACTIVITY_MAX_LENGTH, ACTION_MAX_LENGTH)
-    # If we are using an Embedding layer, there is no need to reshape
-    print 'Shape (X,y):'
-    print X_train.shape
-    print y_train.shape
-    print 'Training set prepared'  
-    sys.stdout.flush()   
-    """
-    # fix random seed for reproducibility
-    np.random.seed(7)
+    # Save training, validation and test sets using numpy serialization
+    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_x_train.npy', X_train)
+    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_x_val.npy', X_val)
+    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_x_test.npy', X_test)
+    
+    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_y_train.npy', y_train)
+    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_y_val.npy', y_val)
+    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_y_test.npy', y_test)
+    
+    print "Formatted data saved"
     
     
-    print 'Loading data'
-    INPUT_DIR = 'formatted_data/'
-    OUTPUT_ROOT_NAME = INPUT_DIR + 'aruba_continuous_no_t_50_10'
-    embedding_matrix = np.load(OUTPUT_ROOT_NAME + '_embedding_weights.npy')
-    X_train = np.load(OUTPUT_ROOT_NAME + '_x_train.npy')
-    X_val = np.load(OUTPUT_ROOT_NAME + '_x_val.npy')
-    X_test = np.load(OUTPUT_ROOT_NAME + '_x_test.npy')
-    
-    y_train = np.load(OUTPUT_ROOT_NAME + '_y_train.npy')
-    y_val = np.load(OUTPUT_ROOT_NAME + '_y_val.npy')
-    y_test = np.load(OUTPUT_ROOT_NAME + '_y_test.npy')
-    
-    max_sequence_length = X_train.shape[1]
-    total_activities = y_train.shape[1]
-    ACTION_MAX_LENGTH = embedding_matrix.shape[1]
-    # Build the model    
-    print 'Building model...'
-    sys.stdout.flush()
-    batch_size = 16
-    model = Sequential()
-    #model.add(Input(shape=(ACTIVITY_MAX_LENGTH,), dtype='int32'))
-    model.add(Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=max_sequence_length, trainable=True))
-    # Change input shape when using embeddings
-    model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2, input_shape=(max_sequence_length, embedding_matrix.shape[1])))
-    #model.add(Dropout(0.8))
-    #model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2))
-    #model.add(Dropout(0.8))
-    model.add(Dense(total_activities))
-    model.add(Activation('softmax'))
-
-    
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'mse', 'mae'])
-    print 'Model built'
-    print(model.summary())
-    sys.stdout.flush()
-  
-
-    print 'Training...'    
-    sys.stdout.flush()
-    # Define the callbacks to be used (EarlyStopping and ModelCheckpoint)
-    earlystopping = EarlyStopping(monitor='val_loss', patience=2, verbose=0)    
-    weights = 'lstm-notime-embedding-weights.hdf5' # TODO: improve file naming for multiple architectures
-    modelcheckpoint = ModelCheckpoint(weights, monitor='val_loss', save_best_only=True, verbose=0)
-    callbacks = [earlystopping, modelcheckpoint]
-    
-    # Automatic training for Stateless LSTM
-    manual_training = False    
-    history = model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=100, validation_data=(X_val, y_val), shuffle=False, callbacks=callbacks)
-        
-    # Use the test set to calculate precision, recall and F-Measure with the bet model
-    model.load_weights(weights)
-    yp = model.predict(X_test, batch_size=1, verbose=1)
-    print "Predictions on test set:"
-    print "yp shape:", yp.shape
-    print yp
-    ypreds = np.argmax(yp, axis=1)
-    print "After using argmax:"
-    print ypreds
-    print "y_test shape:", y_test.shape
-    print y_test
-    print "y_test activity indices:"
-    #ytrue = np.array(y_orig[val_limit:]) # the priginal way
-    ytrue = np.argmax(y_test, axis=1)
-    print ytrue
-    
-    # Use scikit-learn metrics to calculate confusion matrix, accuracy, precision, recall and F-Measure
-    # TODO: test with the whole dataset
-    cm = confusion_matrix(ytrue, ypreds)
-    
-    # Normalize the confusion matrix by row (i.e by the number of samples
-    # in each class)
-    cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-    np.set_printoptions(precision=3, linewidth=1000)
-    print('Confusion matrix')
-    print(cm)
-    
-    print('Normalized confusion matrix')
-    print(cm_normalized)
-    
-    #Dictionary with the values for the metrics (precision, recall and f1)    
-    metrics = calculate_evaluation_metrics(ytrue, ypreds)
-    print "Scikit metrics"
-    print 'accuracy: ', metrics['acc']
-    print 'precision:', metrics['precision']
-    print 'recall:', metrics['recall']
-    print 'f1:', metrics['f1']    
-    
-    #print 'Saving model...'
-    #sys.stdout.flush()
-    #save_model(model)
-    #print 'Model saved'
-    
-    if manual_training == True:
-        plot_training_info(['accuracy', 'loss'], True, history)
-    else:
-        plot_training_info(['accuracy', 'loss'], True, history.history)
-    
-
 if __name__ == "__main__":
    main(sys.argv)
+    
