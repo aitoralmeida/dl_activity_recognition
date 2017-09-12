@@ -10,12 +10,7 @@ import json
 import sys
 from copy import deepcopy
 
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
 import pandas as pd
-
 
 from keras.utils import np_utils
 from keras.preprocessing.sequence import pad_sequences
@@ -31,16 +26,12 @@ DIR = '../sensor2vec/casas_aruba_dataset/'
 # Choose the specific dataset
 #DATASET_CSV = DIR + 'aruba_complete_numeric.csv'
 DATASET_CSV = DIR + 'aruba_no_t.csv'
-#DATASET_CSV = DIR + 'aruba_no_t_testsplit.csv'
 
-# TODO: Action vectors -> Ask Aitor!!
 # ACTION_VECTORS = DIR + 'action2vec/actions_vectors.json'
 # Word2Vec model
 #WORD2VEC_MODEL = DIR + 'action2vec/continuous_complete_numeric_200_10.model' # d=200, win=10
 WORD2VEC_MODEL = DIR + 'action2vec/continuous_no_t_50_10.model' # d=50, win=10
 
-# Maximun number of actions in an activity
-#ACTIVITY_MAX_LENGTH = 32 # Extract from the dataset itself
 
 # Number of dimensions of an action vector
 #ACTION_MAX_LENGTH = 200 # Make coherent with selected WORD2VEC_MODEL
@@ -247,6 +238,8 @@ def main(argv):
     activity_to_int = dict((c, i) for i, c in enumerate(unique_activities))
     # Generate the dict to transform integer numbers to activities
     int_to_activity = dict((i, c) for i, c in enumerate(unique_activities))
+    
+    # TODO: save those two dicts in a file
 
         
     # Prepare sequences using action indices
