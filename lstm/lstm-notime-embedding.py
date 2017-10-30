@@ -164,7 +164,7 @@ def main(argv):
     
     model.add(Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=max_sequence_length, trainable=True))
     # Change input shape when using embeddings
-    model.add(LSTM(512, return_sequences=False, dropout_W=0.8, dropout_U=0.8, input_shape=(max_sequence_length, embedding_matrix.shape[1])))
+    model.add(LSTM(512, return_sequences=False, dropout_W=0.5, dropout_U=0.5, input_shape=(max_sequence_length, embedding_matrix.shape[1])))
     #model.add(Dropout(0.8))
     #model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2))
     #model.add(Dropout(0.8))
