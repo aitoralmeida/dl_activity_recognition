@@ -164,7 +164,7 @@ def main(argv):
     
     model.add(Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=max_sequence_length, trainable=True))
     # Change input shape when using embeddings
-    model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2, input_shape=(max_sequence_length, embedding_matrix.shape[1])))
+    model.add(LSTM(512, return_sequences=False, dropout_W=0.5, dropout_U=0.5, input_shape=(max_sequence_length, embedding_matrix.shape[1])))
     #model.add(Dropout(0.8))
     #model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2))
     #model.add(Dropout(0.8))
@@ -181,14 +181,14 @@ def main(argv):
     print 'Training...'    
     sys.stdout.flush()
     # Define the callbacks to be used (EarlyStopping and ModelCheckpoint)
-    earlystopping = EarlyStopping(monitor='val_loss', patience=2, verbose=0)    
+    earlystopping = EarlyStopping(monitor='val_loss', patience=100, verbose=0)    
     # TODO: improve file naming for multiple architectures
     modelcheckpoint = ModelCheckpoint(WEIGHTS_FILE, monitor='val_loss', save_best_only=True, verbose=0)
     callbacks = [earlystopping, modelcheckpoint]
     
     # Automatic training for Stateless LSTM
     manual_training = False    
-    history = model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=100, validation_data=(X_val, y_val), shuffle=False, callbacks=callbacks)
+    history = model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=1000, validation_data=(X_val, y_val), shuffle=False, callbacks=callbacks)
         
     # Use the test set to calculate precision, recall and F-Measure with the bet model
     model.load_weights(WEIGHTS_FILE)
@@ -213,7 +213,7 @@ def main(argv):
     # Normalize the confusion matrix by row (i.e by the number of samples
     # in each class)
     cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-    np.set_printoptions(precision=3, linewidth=1000)
+    np.set_printoptions(precision=3, linewidth=1000, suppress=True)
     print('Confusion matrix')
     print(cm)
     
