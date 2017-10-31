@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 from keras.models import Sequential
 from keras.models import model_from_json
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-from keras.layers import Dense, Activation, Embedding, Input, Dropout
+from keras.layers import Dense, Activation, Embedding, Input, Dropout, TimeDistributedDense, TimeDistributed
 from keras.layers import LSTM
 
 
@@ -67,7 +67,7 @@ def plot_training_info(metrics, save, history):
         plt.title('model accuracy')
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
+        plt.legend(['train', 'test'], bbox_to_anchor=(1.04,1), loc="upper left")
         if save == True:
             plt.savefig('accuracy.png')
             plt.gcf().clear()
@@ -83,7 +83,7 @@ def plot_training_info(metrics, save, history):
         plt.xlabel('epoch')
         #plt.ylim(1e-3, 1e-2)
         plt.yscale("log")
-        plt.legend(['train', 'test'], loc='upper left')
+        plt.legend(['train', 'test'], bbox_to_anchor=(1.04,1), loc="upper left")
         if save == True:
             plt.savefig('loss.png')
             plt.gcf().clear()
@@ -156,6 +156,14 @@ def main(argv):
     max_sequence_length = X_train.shape[1]
     total_activities = y_train.shape[1]
     ACTION_MAX_LENGTH = embedding_matrix.shape[1]
+    
+    print 'X shape:', X_train.shape
+    print 'y shape:', y_train.shape
+    
+    print 'max sequence length:', max_sequence_length
+    print 'features per action:', embedding_matrix.shape[0]
+    print 'Action max length:', ACTION_MAX_LENGTH
+    
     # Build the model    
     print 'Building model...'
     sys.stdout.flush()
@@ -170,6 +178,28 @@ def main(argv):
     #model.add(Dropout(0.8))
     model.add(Dense(total_activities))
     model.add(Activation('softmax'))
+    
+    # TODO: Test TimeDistributed(dense) in the final dense layer
+    # TODO: reshape y to be 3D tensor (samples, timesteps, categories)
+    """
+    y_train_td = np.zeros(dtype='float', shape=[y_train.shape[0], max_sequence_length, y_train.shape[1]])
+    for i in xrange(len(y_train)):
+        y_train_td[i][:] = y_train[i]
+    y_val_td = np.zeros(dtype='float', shape=[y_val.shape[0], max_sequence_length, y_val.shape[1]])
+    for i in xrange(len(y_val)):
+        y_val_td[i][:] = y_val[i]
+    
+    y_train = y_train_td
+    y_val = y_val_td
+    print 'y shape (for TimeDistributed):', y_train.shape
+    
+    model.add(Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=max_sequence_length, trainable=True))
+    # Change input shape when using embeddings
+    model.add(LSTM(512, return_sequences=True, input_shape=(max_sequence_length, embedding_matrix.shape[1])))
+    model.add(Dropout(0.5))
+    model.add(TimeDistributed(Dense(total_activities, activation='softmax')))
+    #model.add(Activation('softmax'))
+    """
 
     
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', 'mse', 'mae'])
