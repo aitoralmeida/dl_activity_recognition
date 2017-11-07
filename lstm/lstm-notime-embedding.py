@@ -67,9 +67,9 @@ def plot_training_info(metrics, save, history):
         plt.title('model accuracy')
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
-        plt.legend(['train', 'test'], bbox_to_anchor=(1.04,1), loc="upper left")
+        lgd = plt.legend(['train', 'test'], bbox_to_anchor=(1.04,1), loc="upper left")
         if save == True:
-            plt.savefig('accuracy.png')
+            plt.savefig('accuracy.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
             plt.gcf().clear()
         else:
             plt.show()
@@ -85,7 +85,7 @@ def plot_training_info(metrics, save, history):
         plt.yscale("log")
         plt.legend(['train', 'test'], bbox_to_anchor=(1.04,1), loc="upper left")
         if save == True:
-            plt.savefig('loss.png')
+            plt.savefig('loss.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
             plt.gcf().clear()
         else:
             plt.show()
@@ -173,7 +173,7 @@ def main(argv):
     model.add(Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=max_sequence_length, trainable=True))
     # Change input shape when using embeddings
     model.add(LSTM(512, return_sequences=False, dropout_W=0.5, dropout_U=0.5, input_shape=(max_sequence_length, embedding_matrix.shape[1])))
-    #model.add(Dropout(0.8))
+    #model.add(Dropout(0.5))
     #model.add(LSTM(512, return_sequences=False, dropout_W=0.2, dropout_U=0.2))
     #model.add(Dropout(0.8))
     model.add(Dense(total_activities))
@@ -192,7 +192,8 @@ def main(argv):
     y_train = y_train_td
     y_val = y_val_td
     print 'y shape (for TimeDistributed):', y_train.shape
-    
+    # TODO: Have a look at the difference between input_dim and input_shape for the LSTM layer
+    # https://github.com/fchollet/keras/issues/2613
     model.add(Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=max_sequence_length, trainable=True))
     # Change input shape when using embeddings
     model.add(LSTM(512, return_sequences=True, input_shape=(max_sequence_length, embedding_matrix.shape[1])))
