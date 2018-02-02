@@ -29,12 +29,14 @@ from sklearn.metrics import confusion_matrix
 INPUT_DIR = 'formatted_data/'
 INPUT_ROOT_NAME = INPUT_DIR + 'aruba_continuous_no_t_50_10'
 
-# File name for best model weights storage
-WEIGHTS_FILE = 'lstm-notime-embedding-weights.hdf5'
-
 # ID for the experiment which is being run -> used to store the files with
 # appropriate naming
 EXPERIMENT_ID = '06'
+
+# File name for best model weights storage
+WEIGHTS_FILE = EXPERIMENT_ID + 'lstm-notime-embedding-weights.hdf5'
+
+
 
 
 
@@ -218,7 +220,7 @@ def main(argv):
     # Define the callbacks to be used (EarlyStopping and ModelCheckpoint)
     earlystopping = EarlyStopping(monitor='val_loss', patience=100, verbose=0)    
     # TODO: improve file naming for multiple architectures
-    modelcheckpoint = ModelCheckpoint(EXPERIMENT_ID + '_' + WEIGHTS_FILE, monitor='val_loss', save_best_only=True, verbose=0)
+    modelcheckpoint = ModelCheckpoint(WEIGHTS_FILE, monitor='val_loss', save_best_only=True, verbose=0)
     callbacks = [earlystopping, modelcheckpoint]
     
     # Automatic training for Stateless LSTM
@@ -226,7 +228,7 @@ def main(argv):
     history = model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=1000, validation_data=(X_val, y_val), shuffle=False, callbacks=callbacks)
         
     # Use the test set to calculate precision, recall and F-Measure with the bet model
-    model.load_weights(EXPERIMENT_ID + '_' + WEIGHTS_FILE)
+    model.load_weights(WEIGHTS_FILE)
     yp = model.predict(X_test, batch_size=1, verbose=1)
     # TODO: tidy up those prints
     print "Predictions on test set:"
