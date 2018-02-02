@@ -32,6 +32,10 @@ INPUT_ROOT_NAME = INPUT_DIR + 'aruba_continuous_no_t_50_10'
 # File name for best model weights storage
 WEIGHTS_FILE = 'lstm-notime-embedding-weights.hdf5'
 
+# ID for the experiment which is being run -> used to store the files with
+# appropriate naming
+EXPERIMENT_ID = '06'
+
 
 
 
@@ -69,7 +73,7 @@ def plot_training_info(metrics, save, history):
         plt.xlabel('epoch')
         lgd = plt.legend(['train', 'test'], bbox_to_anchor=(1.04,1), loc="upper left")
         if save == True:
-            plt.savefig('accuracy.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+            plt.savefig(EXPERIMENT_ID + '-' + 'accuracy.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
             plt.gcf().clear()
         else:
             plt.show()
@@ -85,7 +89,7 @@ def plot_training_info(metrics, save, history):
         plt.yscale("log")
         plt.legend(['train', 'test'], bbox_to_anchor=(1.04,1), loc="upper left")
         if save == True:
-            plt.savefig('loss.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+            plt.savefig(EXPERIMENT_ID + '-' + 'loss.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
             plt.gcf().clear()
         else:
             plt.show()
@@ -214,12 +218,12 @@ def main(argv):
     # Define the callbacks to be used (EarlyStopping and ModelCheckpoint)
     earlystopping = EarlyStopping(monitor='val_loss', patience=100, verbose=0)    
     # TODO: improve file naming for multiple architectures
-    modelcheckpoint = ModelCheckpoint(WEIGHTS_FILE, monitor='val_loss', save_best_only=True, verbose=0)
+    modelcheckpoint = ModelCheckpoint(EXPERIMENT_ID + '_' + WEIGHTS_FILE, monitor='val_loss', save_best_only=True, verbose=0)
     callbacks = [earlystopping, modelcheckpoint]
     
     # Automatic training for Stateless LSTM
     manual_training = False    
-    history = model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=1000, validation_data=(X_val, y_val), shuffle=False, callbacks=callbacks)
+    history = model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=2, validation_data=(X_val, y_val), shuffle=False, callbacks=callbacks)
         
     # Use the test set to calculate precision, recall and F-Measure with the bet model
     model.load_weights(WEIGHTS_FILE)
@@ -247,9 +251,12 @@ def main(argv):
     np.set_printoptions(precision=3, linewidth=1000, suppress=True)
     print('Confusion matrix')
     print(cm)
+    # Save also the cm to a txt file
+    np.savetxt(EXPERIMENT_ID+'-cm.txt', cm, fmt='%.0f')
     
     print('Normalized confusion matrix')
     print(cm_normalized)
+    np.savetxt(EXPERIMENT_ID+'-cm.txt', cm_normalized, fmt='%.3f')
     
     #Dictionary with the values for the metrics (precision, recall and f1)    
     metrics = calculate_evaluation_metrics(ytrue, ypreds)
