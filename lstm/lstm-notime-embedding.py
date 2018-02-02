@@ -171,7 +171,7 @@ def main(argv):
     # Build the model    
     print 'Building model...'
     sys.stdout.flush()
-    batch_size = 16
+    batch_size = 128
     model = Sequential()
     
     model.add(Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=max_sequence_length, trainable=True))
@@ -223,10 +223,10 @@ def main(argv):
     
     # Automatic training for Stateless LSTM
     manual_training = False    
-    history = model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=2, validation_data=(X_val, y_val), shuffle=False, callbacks=callbacks)
+    history = model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=1000, validation_data=(X_val, y_val), shuffle=False, callbacks=callbacks)
         
     # Use the test set to calculate precision, recall and F-Measure with the bet model
-    model.load_weights(WEIGHTS_FILE)
+    model.load_weights(EXPERIMENT_ID + '_' + WEIGHTS_FILE)
     yp = model.predict(X_test, batch_size=1, verbose=1)
     # TODO: tidy up those prints
     print "Predictions on test set:"
