@@ -256,7 +256,7 @@ def main(argv):
     
     print('Normalized confusion matrix')
     print(cm_normalized)
-    np.savetxt(EXPERIMENT_ID+'-cm.txt', cm_normalized, fmt='%.3f')
+    np.savetxt(EXPERIMENT_ID+'-cm-normalized.txt', cm_normalized, fmt='%.3f')
     
     #Dictionary with the values for the metrics (precision, recall and f1)    
     metrics = calculate_evaluation_metrics(ytrue, ypreds)
