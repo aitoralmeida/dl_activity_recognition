@@ -17,7 +17,7 @@ from keras.models import Sequential
 from keras.models import model_from_json
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Dense, Activation, Embedding, Input, Dropout, TimeDistributedDense, TimeDistributed
-from keras.layers import LSTM
+from keras.layers import LSTM, CuDNNLSTM
 
 
 import numpy as np
@@ -227,9 +227,12 @@ def main(argv):
     manual_training = False    
     history = model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=1000, validation_data=(X_val, y_val), shuffle=False, callbacks=callbacks)
         
+    # Print best val_acc and val_loss
+    print 'Validation accuracy:', max(history.history['val_acc'])
+    print 'Validation loss:', min(history.history['val_loss'])
     # Use the test set to calculate precision, recall and F-Measure with the bet model
     model.load_weights(WEIGHTS_FILE)
-    yp = model.predict(X_test, batch_size=1, verbose=1)
+    yp = model.predict(X_test, batch_size=batch_size, verbose=1)
     # TODO: tidy up those prints
     print "Predictions on test set:"
     print "yp shape:", yp.shape
