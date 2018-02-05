@@ -73,7 +73,7 @@ def plot_training_info(metrics, save, history):
         plt.title('model accuracy')
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
-        lgd = plt.legend(['train', 'test'], bbox_to_anchor=(1.04,1), loc="upper left")
+        lgd = plt.legend(['train', 'val'], bbox_to_anchor=(1.04,1), loc="upper left")
         if save == True:
             plt.savefig(EXPERIMENT_ID + '-' + 'accuracy.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
             plt.gcf().clear()
@@ -89,7 +89,7 @@ def plot_training_info(metrics, save, history):
         plt.xlabel('epoch')
         #plt.ylim(1e-3, 1e-2)
         plt.yscale("log")
-        plt.legend(['train', 'test'], bbox_to_anchor=(1.04,1), loc="upper left")
+        plt.legend(['train', 'val'], bbox_to_anchor=(1.04,1), loc="upper left")
         if save == True:
             plt.savefig(EXPERIMENT_ID + '-' + 'loss.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
             plt.gcf().clear()
