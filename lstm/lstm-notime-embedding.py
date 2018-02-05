@@ -17,7 +17,7 @@ from keras.models import Sequential
 from keras.models import model_from_json
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Dense, Activation, Embedding, Input, Dropout, TimeDistributedDense, TimeDistributed
-from keras.layers import LSTM, CuDNNLSTM
+from keras.layers import LSTM#, CuDNNLSTM
 
 
 import numpy as np
@@ -31,7 +31,7 @@ INPUT_ROOT_NAME = INPUT_DIR + 'aruba_continuous_no_t_50_10'
 
 # ID for the experiment which is being run -> used to store the files with
 # appropriate naming
-EXPERIMENT_ID = '07'
+EXPERIMENT_ID = '08'
 
 # File name for best model weights storage
 WEIGHTS_FILE = EXPERIMENT_ID + '_lstm-notime-embedding-weights.hdf5'
@@ -173,7 +173,7 @@ def main(argv):
     # Build the model    
     print 'Building model...'
     sys.stdout.flush()
-    batch_size = 512
+    batch_size = 1024
     model = Sequential()
     
     model.add(Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=max_sequence_length, trainable=True))
