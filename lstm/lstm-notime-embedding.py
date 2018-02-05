@@ -31,10 +31,10 @@ INPUT_ROOT_NAME = INPUT_DIR + 'aruba_continuous_no_t_50_10'
 
 # ID for the experiment which is being run -> used to store the files with
 # appropriate naming
-EXPERIMENT_ID = '06'
+EXPERIMENT_ID = '07'
 
 # File name for best model weights storage
-WEIGHTS_FILE = EXPERIMENT_ID + 'lstm-notime-embedding-weights.hdf5'
+WEIGHTS_FILE = EXPERIMENT_ID + '_lstm-notime-embedding-weights.hdf5'
 
 
 
@@ -173,7 +173,7 @@ def main(argv):
     # Build the model    
     print 'Building model...'
     sys.stdout.flush()
-    batch_size = 128
+    batch_size = 512
     model = Sequential()
     
     model.add(Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=max_sequence_length, trainable=True))
