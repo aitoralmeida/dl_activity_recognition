@@ -17,7 +17,7 @@ from keras.models import Sequential
 from keras.models import model_from_json
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Dense, Activation, Embedding, Input, Dropout, TimeDistributedDense, TimeDistributed
-from keras.layers import LSTM, CuDNNLSTM
+from keras.layers import LSTM#, CuDNNLSTM
 
 
 import numpy as np
@@ -187,7 +187,8 @@ def main(argv):
     
     # TODO: Test TimeDistributed(dense) in the final dense layer
     # TODO: reshape y to be 3D tensor (samples, timesteps, categories)
-    """
+    """    
+    # This should not be done!!
     y_train_td = np.zeros(dtype='float', shape=[y_train.shape[0], max_sequence_length, y_train.shape[1]])
     for i in xrange(len(y_train)):
         y_train_td[i][:] = y_train[i]
@@ -202,10 +203,13 @@ def main(argv):
     # https://github.com/fchollet/keras/issues/2613
     model.add(Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=max_sequence_length, trainable=True))
     # Change input shape when using embeddings
-    model.add(LSTM(512, return_sequences=True, input_shape=(max_sequence_length, embedding_matrix.shape[1])))
-    model.add(Dropout(0.5))
-    model.add(TimeDistributed(Dense(total_activities, activation='softmax')))
-    #model.add(Activation('softmax'))
+    model.add(LSTM(512, return_sequences=True, dropout_W=0.5, dropout_U=0.5, input_shape=(max_sequence_length, embedding_matrix.shape[1])))    
+    model.add(TimeDistributed(Dense(128, activation='relu')))
+    #model.add(Flatten())
+    model.add(Reshape(128*max_sequence_length))
+    model.add(Dense(128, activation='relu'))
+    model.add(Droput(0.5))
+    model.add(Dense(total_activities, activation='softmax'))    
     """
 
     
