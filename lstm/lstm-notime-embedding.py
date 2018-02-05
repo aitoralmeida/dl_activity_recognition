@@ -27,7 +27,7 @@ from sklearn.metrics import confusion_matrix
 
 # Directory of formatted datasets
 INPUT_DIR = 'formatted_data/'
-INPUT_ROOT_NAME = INPUT_DIR + 'aruba_continuous_no_t_50_10'
+INPUT_ROOT_NAME = INPUT_DIR + 'balanced_aruba_continuous_no_t_50_10'
 
 # ID for the experiment which is being run -> used to store the files with
 # appropriate naming
@@ -229,7 +229,7 @@ def main(argv):
     
     # Automatic training for Stateless LSTM
     manual_training = False    
-    history = model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=1000, validation_data=(X_val, y_val), shuffle=False, callbacks=callbacks)
+    history = model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=1000, validation_data=(X_val, y_val), shuffle=True, callbacks=callbacks)
         
     # Print best val_acc and val_loss
     print 'Validation accuracy:', max(history.history['val_acc'])
