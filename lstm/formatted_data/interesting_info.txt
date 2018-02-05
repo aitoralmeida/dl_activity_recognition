@@ -1,0 +1,30 @@
+Number of activities: 12
+
+Activity names:
+'Sleeping', 'None', 'Bed_to_Toilet', 'Meal_Preparation', 'Relax', 'Housekeeping', 'Eating', 'Wash_Dishes', 'Leave_Home', 'Enter_Home', 'Work', 'Resperate'
+
+Activity codes:
+{'Sleeping': 0,
+ 'None': 1,
+ 'Bed_to_Toilet': 2,
+ 'Meal_Preparation': 3,
+ 'Relax': 4,
+ 'Housekeeping': 5,
+ 'Eating': 6,
+ 'Wash_Dishes': 7,
+ 'Leave_Home': 8,
+ 'Enter_Home': 9,
+ 'Work': 10, 
+ 'Resperate': 11}
+
+Activity distribution for training:
+{'None': 23661, 'Relax': 21109, 'Meal_Preparation': 6861, 'Sleeping': 3034, 'Work': 1107, 'Eating': 992, 'Housekeeping': 457, 'Wash_Dishes': 368, 'Leave_Home': 46, 'Bed_to_Toilet': 25, 'Resperate': 14, 'Enter_Home': 4}
+
+Activity distribution for validation:
+{'Relax': 9436, 'None': 6323, 'Meal_Preparation': 2182, 'Sleeping': 797, 'Eating': 248, 'Work': 171, 'Wash_Dishes': 39, 'Leave_Home': 15, 'Resperate': 10, 'Bed_to_Toilet': 5}
+
+Activity distribution for test:
+{'None': 8050, 'Relax': 7328, 'Meal_Preparation': 2496, 'Sleeping': 754, 'Work': 333, 'Eating': 201, 'Leave_Home': 23, 'Wash_Dishes': 21, 'Resperate': 10, 'Bed_to_Toilet': 7, 'Enter_Home': 4}
+ 
+ 
+ 
