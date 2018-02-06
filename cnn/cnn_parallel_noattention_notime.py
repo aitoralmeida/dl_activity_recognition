@@ -150,11 +150,11 @@ def main(argv):
     print 'Loading data'
     
     embedding_matrix = np.load(INPUT_ROOT_NAME + '_60_embedding_weights.npy')
-    X_train = np.load(INPUT_BALANCED_ROOT_NAME + '_60_x_train.npy')
+    X_train = np.load(INPUT_ROOT_NAME + '_60_x_train.npy')
     X_val = np.load(INPUT_ROOT_NAME + '_60_x_val.npy')
     X_test = np.load(INPUT_ROOT_NAME + '_60_x_test.npy')
     
-    y_train = np.load(INPUT_BALANCED_ROOT_NAME + '_60_y_train.npy')
+    y_train = np.load(INPUT_ROOT_NAME + '_60_y_train.npy')
     y_val = np.load(INPUT_ROOT_NAME + '_60_y_val.npy')
     y_test = np.load(INPUT_ROOT_NAME + '_60_y_test.npy')
     
