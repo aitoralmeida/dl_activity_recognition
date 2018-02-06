@@ -26,11 +26,13 @@ from sklearn.metrics import confusion_matrix
 
 # Directory of formatted datasets
 INPUT_DIR = 'formatted_data/'
-INPUT_ROOT_NAME = INPUT_DIR + 'balanced_aruba_continuous_no_t_50_10'
+INPUT_BALANCED_ROOT_NAME = INPUT_DIR + 'balanced_aruba_continuous_no_t_50_10'
+INPUT_ROOT_NAME = INPUT_DIR + 'aruba_continuous_no_t_50_10'
+
 
 # ID for the experiment which is being run -> used to store the files with
 # appropriate naming
-EXPERIMENT_ID = '08'
+EXPERIMENT_ID = '09'
 
 # File name for best model weights storage
 WEIGHTS_FILE = EXPERIMENT_ID + '_lstm-notime-embedding-weights.hdf5'
@@ -150,11 +152,11 @@ def main(argv):
     print 'Loading data'
     
     embedding_matrix = np.load(INPUT_ROOT_NAME + '_60_embedding_weights.npy')
-    X_train = np.load(INPUT_ROOT_NAME + '_60_x_train.npy')
+    X_train = np.load(INPUT_BALANCED_ROOT_NAME + '_60_x_train.npy')
     X_val = np.load(INPUT_ROOT_NAME + '_60_x_val.npy')
     X_test = np.load(INPUT_ROOT_NAME + '_60_x_test.npy')
     
-    y_train = np.load(INPUT_ROOT_NAME + '_60_y_train.npy')
+    y_train = np.load(INPUT_BALANCED_ROOT_NAME + '_60_y_train.npy')
     y_val = np.load(INPUT_ROOT_NAME + '_60_y_val.npy')
     y_test = np.load(INPUT_ROOT_NAME + '_60_y_test.npy')
     
