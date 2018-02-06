@@ -29,10 +29,10 @@ INPUT_ROOT_NAME = INPUT_DIR + 'aruba_continuous_no_t_50_10'
 
 # ID for the experiment which is being run -> used to store the files with
 # appropriate naming
-EXPERIMENT_ID = '01'
+EXPERIMENT_ID = '03'
 
 # File name for best model weights storage
-WEIGHTS_FILE = EXPERIMENT_ID + '_cnn_parallel_noattention_notime.hdf5'
+WEIGHTS_FILE = EXPERIMENT_ID + '_only_attention.hdf5'
 
 #number of input actions for the model
 INPUT_ACTIONS = 125
