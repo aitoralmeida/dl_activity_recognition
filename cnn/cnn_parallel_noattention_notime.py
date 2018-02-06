@@ -207,9 +207,18 @@ def main(argv):
     
     ngram_5 = Convolution2D(200, 5, ACTION_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_5')(reshape)
     maxpool_5 = MaxPooling2D(pool_size=(INPUT_ACTIONS-5+1,1), name = 'pooling_5')(ngram_5)
+    
+    ngram_6 = Convolution2D(200, 6, ACTION_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_6')(reshape)
+    maxpool_6 = MaxPooling2D(pool_size=(INPUT_ACTIONS-6+1,1), name = 'pooling_6')(ngram_6)
+    
+    ngram_7 = Convolution2D(200, 7, ACTION_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_7')(reshape)
+    maxpool_7 = MaxPooling2D(pool_size=(INPUT_ACTIONS-7+1,1), name = 'pooling_7')(ngram_7)
+    
+    ngram_8 = Convolution2D(200, 8, ACTION_EMBEDDING_LENGTH, border_mode='valid',activation='relu', name = 'conv_8')(reshape)
+    maxpool_8 = MaxPooling2D(pool_size=(INPUT_ACTIONS-8+1,1), name = 'pooling_8')(ngram_8)
            
     #1 branch again
-    merged = merge([maxpool_2, maxpool_3, maxpool_4, maxpool_5], mode='concat', concat_axis=2)    
+    merged = merge([maxpool_2, maxpool_3, maxpool_4, maxpool_5, maxpool_6, maxpool_7, maxpool_8], mode='concat', concat_axis=2)    
     flatten = Flatten(name = 'flatten')(merged)
 #    batch_norm = BatchNormalization()(flatten)
     dense_1 = Dense(256, activation = 'relu',name = 'dense_1')(flatten)
