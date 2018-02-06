@@ -194,7 +194,7 @@ def main(argv):
     input_actions = Input(shape=(INPUT_ACTIONS,), dtype='int32', name='input_actions')
     embedding_actions = Embedding(input_dim=embedding_matrix.shape[0], output_dim=embedding_matrix.shape[1], weights=[embedding_matrix], input_length=INPUT_ACTIONS, trainable=True, name='embedding_actions')(input_actions)        
     #attention mechanism
-    gru = GRU(128, input_shape=(INPUT_ACTIONS, ACTION_EMBEDDING_LENGTH), return_sequences=True, name='gru')(embedding_actions)
+    gru = Bidirectional(GRU(128, input_shape=(INPUT_ACTIONS, ACTION_EMBEDDING_LENGTH), return_sequences=True, name='gru'), merge_mode='mul')(embedding_actions)
     # total units = 128 * INPUT_ACTIONS
     dense_att_1 = TimeDistributed(Dense(128, activation = 'tanh',name = 'dense_att_1'))(gru)
     # total units = 1 * INPUT_ACTIONS
