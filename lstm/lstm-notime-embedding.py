@@ -6,7 +6,6 @@ Created on Tue Oct 25 16:16:52 2016
 """
 
 from collections import Counter
-import json
 import sys
 
 import matplotlib
@@ -170,6 +169,22 @@ def main(argv):
     print 'features per action:', embedding_matrix.shape[0]
     print 'Action max length:', ACTION_MAX_LENGTH
     
+    # Show the activity distribution for each set
+    # We transform one-hot vector to integer codes
+    y_train_code = np.array([np.argmax(y_train[x]) for x in xrange(len(y_train))])    
+    y_val_code = np.array([np.argmax(y_val[x]) for x in xrange(len(y_val))])
+    y_test_code = np.array([np.argmax(y_test[x]) for x in xrange(len(y_test))])
+    
+    print "Activity distribution for training:"
+    print Counter(y_train_code)
+    
+    print "Activity distribution for validation:"
+    print Counter(y_val_code)
+    
+    print "Activity distribution for testing:"
+    print Counter(y_test_code)
+    
+    #sys.exit()
     # Build the model    
     print 'Building model...'
     sys.stdout.flush()
