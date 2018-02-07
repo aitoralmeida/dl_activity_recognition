@@ -186,7 +186,7 @@ def main(argv):
     print "Activity distribution for testing:"
     print Counter(y_test_code)
     
-    #sys.exit()
+    sys.exit()
     # Build the model    
     print 'Building model...'
     sys.stdout.flush()

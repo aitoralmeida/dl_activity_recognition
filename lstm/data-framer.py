@@ -6,7 +6,6 @@ Created on Mon Sep 11 14:38:48 2017
 """
 
 from collections import Counter
-import json
 import sys
 from copy import deepcopy
 
@@ -17,6 +16,8 @@ from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
 
 from gensim.models import Word2Vec
+
+from sklearn.model_selection import StratifiedShuffleSplit
 
 import numpy as np
 
@@ -38,6 +39,14 @@ WORD2VEC_MODEL = DIR + 'action2vec/continuous_no_t_50_10.model' # d=50, win=10
 ACTION_MAX_LENGTH = 50 # Make coherent with selected WORD2VEC_MODEL
 
 OUTPUT_ROOT_NAME = 'formatted_data/aruba_continuous_no_t_50_10' # make coherent with WORD2VEC_MODEL
+
+# Time interval for action segmentation
+DELTA = 60
+
+# To create training, validation and test set, we can load previously generated X and y files
+READ_PREVIOUS_XY = True
+PREVIOUS_X = OUTPUT_ROOT_NAME + '_' + str(DELTA) + '_x.npy'
+PREVIOUS_Y = OUTPUT_ROOT_NAME + '_' + str(DELTA) + '_y.npy'
 
 
 """
@@ -210,68 +219,9 @@ def create_embedding_matrix(tokenizer):
     return embedding_matrix
 
 
-# Function to check the distribution of activities in a given set
-def check_activity_distribution(y_np, unique_activities):
-    activities = []
-    for activity_np in y_np:
-        index = activity_np.tolist().index(1.0)
-        activities.append(unique_activities[index])
-    print Counter(activities)
 
-
-# Main function
-def main(argv):
-    
-    # Load dataset from csv file
-    df = pd.read_csv(DATASET_CSV, parse_dates=[0], header=None)
-    df.columns = ["timestamp", 'action', 'activity']    
-    
-    #df = df[0:1000] # reduce dataset for tests    
-    unique_activities = df['activity'].unique()
-    print "Unique activities:"
-    print unique_activities
-
-    total_activities = len(unique_activities)
-    #action_vectors = json.load(open(ACTION_VECTORS, 'r'))
-    
-    # Generate the dict to transform activities to integer numbers
-    activity_to_int = dict((c, i) for i, c in enumerate(unique_activities))
-    # Generate the dict to transform integer numbers to activities
-    int_to_activity = dict((i, c) for i, c in enumerate(unique_activities))
-    
-    # TODO: save those two dicts in a file
-
-        
-    # Prepare sequences using action indices
-    # Each action will be an index which will point to an action vector
-    # in the weights matrix of the Embedding layer of the network input
-    # Use 'delta' to establish slicing time; if 0, slicing done on activity type basis
-    delta = 60 # To test the same time slicing as Kasteren (60)
-    X, y, tokenizer, max_sequence_length = prepare_embeddings(df, activity_to_int, delta=delta)
-    
-    # Create the embedding matrix for the embedding layer initialization
-    embedding_matrix = create_embedding_matrix(tokenizer)    
-    
-    print 'max sequence length:', max_sequence_length
-    print 'X shape:', X.shape
-    
-    print 'embedding matrix shape:', embedding_matrix.shape
-    
-    
-    
-    # Keep original y (with activity indices) before transforming it to categorical
-    y_orig = deepcopy(y)
-    # Tranform class labels to one-hot encoding
-    y = np_utils.to_categorical(y)
-    print 'y shape:', y.shape
-    
-    # Save X, y and embedding_matrix using numpy serialization
-    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_x.npy', X)
-    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_y.npy', y)
-    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_embedding_weights.npy', embedding_matrix)
-    
-    
-    # Prepare training, validation and testing datasets    
+def createStoreNaiveDatasets(X, y):
+    print "Naive strategy"
     total_examples = len(X)
     train_per = 0.6
     val_per = 0.2
@@ -284,39 +234,159 @@ def main(argv):
     X_test = X[val_limit:]
     y_train = y[0:train_limit]
     y_val = y[train_limit:val_limit]
-    y_test = y[val_limit:]
-    print 'Max sequence length:', max_sequence_length
-    print 'Total examples:', total_examples
-    print 'Train examples:', len(X_train), len(y_train) 
-    print 'Validation examples:', len(X_val), len(y_val)
-    print 'Test examples:', len(X_test), len(y_test)
+    y_test = y[val_limit:]    
+    print '  Total examples:', total_examples
+    print '  Train examples:', len(X_train), len(y_train) 
+    print '  Validation examples:', len(X_val), len(y_val)
+    print '  Test examples:', len(X_test), len(y_test)
     sys.stdout.flush()  
     X_train = np.array(X_train)
     y_train = np.array(y_train)    
-    print 'Activity distribution for training:'
-    check_activity_distribution(y_train, unique_activities)
+    print '  Activity distribution for training:'
+    y_train_code = np.array([np.argmax(y_train[x]) for x in xrange(len(y_train))])
+    print Counter(y_train_code)
 
     X_val = np.array(X_val)
     y_val = np.array(y_val)
-    print 'Activity distribution for validation:'
-    check_activity_distribution(y_val, unique_activities)
+    print '  Activity distribution for validation:'
+    y_val_code = np.array([np.argmax(y_val[x]) for x in xrange(len(y_val))])
+    print Counter(y_val_code)
     
     X_test = np.array(X_test)
     y_test = np.array(y_test)    
 
-    print 'Activity distribution for testing:'
-    check_activity_distribution(y_test, unique_activities)
+    print '  Activity distribution for testing:'
+    y_test_code = np.array([np.argmax(y_test[x]) for x in xrange(len(y_test))])
+    print Counter(y_test_code)
 
     # Save training, validation and test sets using numpy serialization
-    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_x_train.npy', X_train)
-    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_x_val.npy', X_val)
-    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_x_test.npy', X_test)
+    np.save(OUTPUT_ROOT_NAME + '_' + str(DELTA) + '_x_train.npy', X_train)
+    np.save(OUTPUT_ROOT_NAME + '_' + str(DELTA) + '_x_val.npy', X_val)
+    np.save(OUTPUT_ROOT_NAME + '_' + str(DELTA) + '_x_test.npy', X_test)
     
-    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_y_train.npy', y_train)
-    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_y_val.npy', y_val)
-    np.save(OUTPUT_ROOT_NAME + '_' + str(delta) + '_y_test.npy', y_test)
+    np.save(OUTPUT_ROOT_NAME + '_' + str(DELTA) + '_y_train.npy', y_train)
+    np.save(OUTPUT_ROOT_NAME + '_' + str(DELTA) + '_y_val.npy', y_val)
+    np.save(OUTPUT_ROOT_NAME + '_' + str(DELTA) + '_y_test.npy', y_test)
     
-    print "Formatted data saved"
+    print "  Formatted data saved"
+    
+def createStoreStratifiedDatasets(X, y):
+    print "Stratified strategy"
+    
+    # Create the StratifiedShuffleSplit object
+    sss = StratifiedShuffleSplit(n_splits=1, test_size=0.2, random_state=0)
+    # Generate indices for training and testing set
+    # As sss.split() is a generator, we must use next()
+    train_index, test_index = sss.split(X, y).next()
+    
+    # Generate X_train, y_train, X_test and y_test
+    X_train = X[train_index]
+    y_train = y[train_index]
+    X_test = X[test_index]
+    y_test = y[test_index]
+    
+    # Now, generate the validation sets from the training set
+    # For validation set we keep using 20% of the training data
+    train_index, val_index = sss.split(X_train, y_train).next()
+    X_val = X_train[val_index]
+    y_val = y_train[val_index]
+    X_train = X_train[train_index]
+    y_train = y_train[train_index]
+    
+    # Print activity distributions to make sure everything is allright
+    print '  X_train shape:', X_train.shape
+    print '  y_train shape:', y_train.shape
+    y_train_code = np.array([np.argmax(y_train[x]) for x in xrange(len(y_train))])
+    print '  Activity distribution for training:'    
+    print Counter(y_train_code)
+    print '  X_val shape:', X_val.shape
+    print '  y_val shape:', y_val.shape
+    y_val_code = np.array([np.argmax(y_val[x]) for x in xrange(len(y_val))])
+    print '  Activity distribution for training:'    
+    print Counter(y_val_code)
+    print '  X_test shape:', X_test.shape
+    print '  y_test shape:', y_test.shape
+    y_test_code = np.array([np.argmax(y_test[x]) for x in xrange(len(y_test))])
+    print '  Activity distribution for training:'    
+    print Counter(y_test_code)
+    
+    # Save the generated datasets in the corresponding files
+    np.save(OUTPUT_ROOT_NAME + '_stratified_' + str(DELTA) + '_x_train.npy', X_train)
+    np.save(OUTPUT_ROOT_NAME + '_stratified_' + str(DELTA) + '_x_val.npy', X_val)
+    np.save(OUTPUT_ROOT_NAME + '_stratified_' + str(DELTA) + '_x_test.npy', X_test)
+    
+    np.save(OUTPUT_ROOT_NAME + '_stratified_' + str(DELTA) + '_y_train.npy', y_train)
+    np.save(OUTPUT_ROOT_NAME + '_stratified_' + str(DELTA) + '_y_val.npy', y_val)
+    np.save(OUTPUT_ROOT_NAME + '_stratified_' + str(DELTA) + '_y_test.npy', y_test)
+    
+    
+
+# Main function
+def main(argv):
+    
+    if READ_PREVIOUS_XY == False:
+        # Load dataset from csv file
+        df = pd.read_csv(DATASET_CSV, parse_dates=[0], header=None)
+        df.columns = ["timestamp", 'action', 'activity']    
+    
+        #df = df[0:1000] # reduce dataset for tests    
+        unique_activities = df['activity'].unique()
+        print "Unique activities:"
+        print unique_activities
+
+        total_activities = len(unique_activities)
+        #action_vectors = json.load(open(ACTION_VECTORS, 'r'))
+    
+        # Generate the dict to transform activities to integer numbers
+        activity_to_int = dict((c, i) for i, c in enumerate(unique_activities))
+        # Generate the dict to transform integer numbers to activities
+        int_to_activity = dict((i, c) for i, c in enumerate(unique_activities))
+    
+        # TODO: save those two dicts in a file
+
+        
+        # Prepare sequences using action indices
+        # Each action will be an index which will point to an action vector
+        # in the weights matrix of the Embedding layer of the network input
+        # Use 'delta' to establish slicing time; if 0, slicing done on activity type basis    
+        X, y, tokenizer, max_sequence_length = prepare_embeddings(df, activity_to_int, delta=DELTA)
+    
+        # Create the embedding matrix for the embedding layer initialization
+        embedding_matrix = create_embedding_matrix(tokenizer)    
+    
+        print 'max sequence length:', max_sequence_length
+        print 'X shape:', X.shape
+    
+        print 'embedding matrix shape:', embedding_matrix.shape
+    
+    
+    
+        # Keep original y (with activity indices) before transforming it to categorical
+        y_orig = deepcopy(y)
+        # Tranform class labels to one-hot encoding
+        y = np_utils.to_categorical(y)
+        print 'y shape:', y.shape
+    
+        # Save X, y and embedding_matrix using numpy serialization
+        np.save(OUTPUT_ROOT_NAME + '_' + str(DELTA) + '_x.npy', X)
+        np.save(OUTPUT_ROOT_NAME + '_' + str(DELTA) + '_y.npy', y)
+        np.save(OUTPUT_ROOT_NAME + '_' + str(DELTA) + '_embedding_weights.npy', embedding_matrix)
+        
+    else:
+    
+        X = np.load(PREVIOUS_X)
+        y= np.load(PREVIOUS_Y)
+        # Prepare training, validation and testing datasets
+        # We implement two strategies for this:    
+        # 1: Naive datasets, using only the percentages
+        # This strategy preserves the original sequences and time dependencies
+        # It can be useful for stateful LSTMs
+        #createStoreNaiveDatasets(X, y)
+    
+        # 2: Stratified datasets, making sure all three sets have the same percentage of classes
+        # This strategy may break the time dependencies amongst sequences
+        createStoreStratifiedDatasets(X, y)
+    
     
     
 if __name__ == "__main__":
