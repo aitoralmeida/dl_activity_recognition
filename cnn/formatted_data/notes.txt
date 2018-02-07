@@ -1,0 +1,11 @@
+Numpy files (.npy)
+
+naming format: 'root file' + 'delta' + 'nature' + '.npy'
+
+root file: the file name of the Word2Vec model used.
+delta: the time considered in each input action sequence
+nature: embedding_weights, x, x_train, x_val, x_test, y, y_train, y_val, y_test
+
+For example: 'aruba_continuous_no_t_50_10_60_x.npy' means that this file was generated using the 'aruba_continuous_no_t_50_10.model' Word2Vec model, with a delta value of 60 and contains the input sequences (action vector sequences) of the complete dataset.
+
+-------------------------------------------------
