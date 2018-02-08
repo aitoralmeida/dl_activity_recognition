@@ -26,20 +26,24 @@ from sklearn.metrics import confusion_matrix
 
 # Directory of formatted datasets
 INPUT_DIR = 'formatted_data/'
-INPUT_BALANCED_ROOT_NAME = INPUT_DIR + 'balanced_aruba_continuous_no_t_50_10'
-INPUT_ROOT_NAME = INPUT_DIR + 'aruba_continuous_no_t_50_10'
+
+EMBEDDING_WEIGHTS = INPUT_DIR + 'aruba_continuous_no_t_50_10_60_embedding_weights.npy'
+
+TRAINING_DATA = INPUT_DIR + 'balanced_aruba_continuous_no_t_50_10_stratified_60_x_train.npy'
+VALIDATION_DATA = INPUT_DIR + 'balanced_aruba_continuous_no_t_50_10_stratified_60_x_val.npy'
+TESTING_DATA = INPUT_DIR + 'aruba_continuous_no_t_50_10_stratified_60_x_test.npy'
+
+TRAINING_LABELS = INPUT_DIR + 'balanced_aruba_continuous_no_t_50_10_stratified_60_y_train.npy'
+VALIDATION_LABELS = INPUT_DIR + 'balanced_aruba_continuous_no_t_50_10_stratified_60_y_val.npy'
+TESTING_LABELS = INPUT_DIR + 'aruba_continuous_no_t_50_10_stratified_60_y_test.npy'
 
 
 # ID for the experiment which is being run -> used to store the files with
 # appropriate naming
-EXPERIMENT_ID = '10'
+EXPERIMENT_ID = '11'
 
 # File name for best model weights storage
 WEIGHTS_FILE = EXPERIMENT_ID + '_lstm-notime-embedding-weights.hdf5'
-
-
-
-
 
 
 
@@ -151,14 +155,14 @@ def main(argv):
     
     print 'Loading data'
     
-    embedding_matrix = np.load(INPUT_ROOT_NAME + '_60_embedding_weights.npy')
-    X_train = np.load(INPUT_ROOT_NAME + '_stratified_60_x_train.npy')
-    X_val = np.load(INPUT_ROOT_NAME + '_stratified_60_x_val.npy')
-    X_test = np.load(INPUT_ROOT_NAME + '_stratified_60_x_test.npy')
+    embedding_matrix = np.load(EMBEDDING_WEIGHTS)    
+    X_train = np.load(TRAINING_DATA)    
+    X_val = np.load(VALIDATION_DATA)    
+    X_test = np.load(TESTING_DATA)
     
-    y_train = np.load(INPUT_ROOT_NAME + '_stratified_60_y_train.npy')
-    y_val = np.load(INPUT_ROOT_NAME + '_stratified_60_y_val.npy')
-    y_test = np.load(INPUT_ROOT_NAME + '_stratified_60_y_test.npy')
+    y_train = np.load(TRAINING_LABELS)
+    y_val = np.load(VALIDATION_LABELS)    
+    y_test = np.load(TESTING_LABELS)
     
     max_sequence_length = X_train.shape[1]
     total_activities = y_train.shape[1]

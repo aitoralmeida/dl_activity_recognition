@@ -12,10 +12,10 @@ from collections import Counter
 
 # Directory of formatted datasets
 INPUT_DIR = 'formatted_data/'
-ROOT_NAME = 'aruba_continuous_no_t_50_10'
+ROOT_NAME = 'aruba_continuous_no_t_50_10_stratified'
 INPUT_ROOT_NAME = INPUT_DIR + ROOT_NAME
-INPUT_X_TAIL = '_60_x_train.npy'
-INPUT_Y_TAIL = '_60_y_train.npy'
+INPUT_X_TAIL = '_60_x_val.npy'
+INPUT_Y_TAIL = '_60_y_val.npy'
 
 # Store results in
 OUTPUT_X_FILE = INPUT_DIR + 'balanced_' + ROOT_NAME + INPUT_X_TAIL
@@ -28,36 +28,36 @@ def main(argv):
     print 'Loading data'
     
     # We load here the action indices
-    X_train = np.load(INPUT_ROOT_NAME + INPUT_X_TAIL)
+    X = np.load(INPUT_ROOT_NAME + INPUT_X_TAIL)
     # We load here activity labels using one-hot vector encoding
-    y_train = np.load(INPUT_ROOT_NAME + INPUT_Y_TAIL)
+    y = np.load(INPUT_ROOT_NAME + INPUT_Y_TAIL)
     
     # We transform one-hot vector to integer codes
-    y_train_code = np.array([np.argmax(y_train[x]) for x in xrange(len(y_train))])
+    y_code = np.array([np.argmax(y[x]) for x in xrange(len(y))])
     
-    print 'X_train shape:', X_train.shape
-    print 'y_train shape:', y_train.shape
-    print 'y_train_code shape:', y_train_code.shape
+    print 'X shape:', X.shape
+    print 'y shape:', y.shape
+    print 'y_code shape:', y_code.shape
     
     # We calculate the distribution of activities
-    distro_dict = Counter(y_train_code)
+    distro_dict = Counter(y_code)
     print 'Activity distribution:', distro_dict 
     max_instances = max(distro_dict.values())
     print 'Maximum number of instances:', max_instances
     
     # 'mew_x' and 'new_y' are used to generate the replicated and balanced dataset
-    new_x = np.copy(X_train)
-    new_y = np.copy(y_train)
+    new_x = np.copy(X)
+    new_y = np.copy(y)
     for key in distro_dict.keys():
         instances = distro_dict[key]
         print 'Instances for activity', key, ':', instances
         # Obtain the indices where y_train_code equals the activity in key
-        indices = np.where(y_train_code == key)
+        indices = np.where(y_code == key)
         # As np.where returns a tuple we will extract the internal np.array
         indices = indices[0]
         # Obtain the samples we can use for replication
-        samples = X_train[indices]
-        labels = y_train[indices]
+        samples = X[indices]
+        labels = y[indices]
         print '  Shape of samples:', samples.shape
         print '  Shape of labels:', labels.shape
         
@@ -76,12 +76,12 @@ def main(argv):
         
           
         print 'After replication'
-        new_y_train_codes = np.array([np.argmax(new_y[x]) for x in xrange(len(new_y))])
-        count = np.where(new_y_train_codes == key)
+        new_y_codes = np.array([np.argmax(new_y[x]) for x in xrange(len(new_y))])
+        count = np.where(new_y_codes == key)
         count = count[0]
         print 'Instances for activity', key, len(count)
     
-    new_distro_dict = Counter(new_y_train_codes)
+    new_distro_dict = Counter(new_y_codes)
     print 'New activity distribution:'
     print new_distro_dict
     
